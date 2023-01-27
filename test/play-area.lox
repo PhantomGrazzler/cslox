@@ -1,0 +1,116 @@
+// No ability to print newlines.
+print "";
+
+{
+    print "PRINTING VALUES:";
+    print "Hello from Lox play-area";
+    print true;
+    print 1245;
+    print 12.86;
+    print nil;
+}
+
+print "";
+
+// Looks like Lox is missing a way to convert numbers, Booleans, and nil, to strings, at least when you want to print
+// out a prefix followed by a value, e.g.
+//      print "1+1=" + (1+1);
+{
+    print "ARITHMETIC:";
+    print 1+1;
+    print 1-1;
+    print 2*3;
+    print 10/2;
+    print -1;
+}
+
+print "";
+
+{
+    print "VARIABLES:";
+    var min = 45;
+    var max = 393;
+    var average = (min + max) / 2;
+    
+    print average;
+    
+    if(min < max)
+    {
+        print min;
+    }
+    else
+    {
+        print "min is not less than max!";
+    }
+}
+
+print "";
+
+{
+    print "FUNCTIONS:";
+    
+    fun printSum(a, b)
+    {
+        print a+b;
+    }
+    printSum(3, 4);
+}
+
+print "";
+
+{
+    // Lox does not have virtual methods on classes.
+    print "CLASSES:";
+    
+    class Animal
+    {
+        init(name)
+        {
+            this.name = name;
+        }
+        
+        printName()
+        {
+            print "My name is " + this.name;
+        }
+    }
+    
+    class Cat < Animal
+    {
+        init(name)
+        {
+            super.init(name); // Not strictly necessary unless we want to do something different.
+        }
+    
+        speak()
+        {
+            print "Meow";
+        }
+    }
+    
+    class Dog < Animal
+    {
+        speak()
+        {
+            print "Woof, woof!";
+        }
+    }
+    
+    var cat = Cat("Tigger");
+    cat.printName();
+    cat.speak();
+    
+    var dog = Dog("Joseph");
+    dog.printName();
+    dog.speak();
+    
+    
+}
+
+print "";
+
+{
+    print "STANDARD LIBRARY:";
+    print "Seconds since program start:";
+    print clock();
+}
