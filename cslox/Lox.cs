@@ -1,48 +1,47 @@
-﻿namespace cslox
+﻿namespace cslox;
+
+internal class Lox
 {
-    internal class Lox
+    private static bool HadError = false;
+
+    internal static void RunFile(string path)
     {
-        private static bool HadError = false;
+        var file = File.OpenText(path);
+        Run(file.ReadToEnd());
 
-        internal static void RunFile(string path)
+        if (HadError)
         {
-            var file = File.OpenText(path);
-            Run(file.ReadToEnd());
-
-            if(HadError)
-            {
-                Environment.Exit(65);
-            }
+            Environment.Exit(65);
         }
+    }
 
-        internal static void RunPrompt()
+    internal static void RunPrompt()
+    {
+        while (true)
         {
-            while(true) 
-            {
-                Console.Write("> ");
-                var line = Console.ReadLine();
-                if (line == null) break;
-                Run(line);
-                HadError = false;
-            }
+            Console.Write("> ");
+            var line = Console.ReadLine();
+            if (line == null) break;
+            Run(line);
+            HadError = false;
         }
+    }
 
-        private static void Run(string source)
-        {
-            var scanner = new Scanner(source);
-            var tokens = scanner.ScanTokens();
-            tokens.ForEach(token => Console.WriteLine(token));
-        }
+    private static void Run(string source)
+    {
+        var scanner = new Scanner(source);
+        var tokens = scanner.ScanTokens();
+        tokens.ForEach(token => Console.WriteLine(token));
+    }
 
-        internal static void Error(int line, string message)
-        {
-            Report(line, where: "", message);
-        }
+    internal static void Error(int line, string message)
+    {
+        Report(line, where: "", message);
+    }
 
-        private static void Report(int line, string where, string message) 
-        {
-            Console.Error.WriteLine($"[line {line}] Error {where}: {message}");
-            HadError = true;
-        }
+    private static void Report(int line, string where, string message)
+    {
+        Console.Error.WriteLine($"[line {line}] Error {where}: {message}");
+        HadError = true;
     }
 }
