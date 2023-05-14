@@ -1,7 +1,11 @@
 ﻿namespace cslox;
 
-internal enum TokenType
+/// <summary>
+/// TODO
+/// </summary>
+public enum TokenType
 {
+#pragma warning disable 1591
     // Single-character tokens.
     LeftParen, RightParen, LeftBrace, RightBrace, Comma, Dot, Minus, Plus, Semicolon, Slash, Star,
 
@@ -15,4 +19,5 @@ internal enum TokenType
     And, Class, Else, False, Fun, For, If, Nil, Or, Print, Return, Super, This, True, Var, While,
 
     Eof,
+#pragma warning restore 1591
 }

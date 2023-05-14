@@ -1,6 +1,9 @@
 ﻿namespace cslox;
 
-internal class Scanner
+/// <summary>
+/// TODO
+/// </summary>
+public class Scanner
 {
     private readonly string m_source;
     private readonly List<Token> m_tokens = new();
@@ -27,12 +30,20 @@ internal class Scanner
         {"while",   TokenType.While},
     };
 
-    internal Scanner(string source)
+    /// <summary>
+    /// TODO
+    /// </summary>
+    /// <param name="source"></param>
+    public Scanner(string source)
     {
         m_source = source;
     }
 
-    internal List<Token> ScanTokens()
+    /// <summary>
+    /// TODO
+    /// </summary>
+    /// <returns></returns>
+    public List<Token> ScanTokens()
     {
         while(!IsAtEnd())
         {

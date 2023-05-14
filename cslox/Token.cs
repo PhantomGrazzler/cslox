@@ -1,22 +1,30 @@
 ﻿namespace cslox;
 
-internal class Token
+/// <summary>
+/// TODO
+/// </summary>
+public class Token
 {
-    private readonly TokenType m_type;
     private readonly string m_lexeme;
     private readonly object m_literal;
     private readonly int m_line;
 
+    /// <summary>
+    /// TODO
+    /// </summary>
+    public readonly TokenType Type;
+
     internal Token(TokenType token_type, string lexeme, object literal, int line)
     {
-        m_type = token_type;
+        Type = token_type;
         m_lexeme = lexeme;
         m_literal = literal;
         m_line = line;
     }
 
+    /// <inheritdoc/>
     public override string ToString()
     {
-        return m_type.ToString() + " " + m_lexeme + " " + m_literal;
+        return $"{Type} {m_lexeme} {m_literal}";
     }
 }
