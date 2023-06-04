@@ -145,4 +145,38 @@ public class ScannerTests
         Assert.Single(tokens);
         Assert.Equal(TokenType.Eof, tokens.First().Type);
     }
+
+    [Fact]
+    public void Comments()
+    {
+        var input = @"// First line comment
+// Second line comment!! //
+// fun hello() { print(hello); }";
+
+        var tokens = ScanTokens(input);
+
+        Assert.Single(tokens);
+        Assert.Equal(TokenType.Eof, tokens.First().Type);
+    }
+
+    [Fact]
+    public void MultilineString()
+    {
+        var multilineString = "\"first line\nsecond line\"";
+        var tokens = ScanTokens(multilineString);
+
+        Assert.Equal(2, tokens.Count);
+        Assert.Equal(TokenType.String, tokens.First().Type);
+    }
+
+    [Fact]
+    public void MultilineInput()
+    {
+        var multilineInput = "var count = 1;\n" + // 5 tokens
+            "{ print nil; }\n" + // 5 tokens
+            "print -1;"; // 4 tokens + EOF token
+        var tokens = ScanTokens(multilineInput);
+
+        Assert.Equal(15, tokens.Count);
+    }
 }
