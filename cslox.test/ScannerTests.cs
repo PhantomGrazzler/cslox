@@ -65,6 +65,16 @@ public class ScannerTests
         Assert.Equal(expectedType, tokens.First().Type);
     }
 
+    [Fact]
+    public void UnterminatedString()
+    {
+        var scanner = new Scanner("\"unterminated string");
+        var tokens = scanner.ScanTokens();
+
+        Assert.Single(tokens);
+        Assert.Equal(TokenType.Eof, tokens.First().Type);
+    }
+
     [Theory]
     [InlineData("and", TokenType.And)]
     [InlineData("class", TokenType.Class)]
@@ -89,5 +99,52 @@ public class ScannerTests
 
         Assert.Equal(2, tokens.Count);
         Assert.Equal(expectedType, tokens.First().Type);
+    }
+
+    [Theory]
+    [InlineData("And")]
+    [InlineData("cLass")]
+    [InlineData("elSe")]
+    [InlineData("falsE")]
+    [InlineData("FUN")]
+    [InlineData("FoR")]
+    [InlineData("iF")]
+    [InlineData("nil_")]
+    [InlineData("_or")]
+    [InlineData("print1")]
+    [InlineData("return2")]
+    [InlineData("sup3r")]
+    public void AlmostKeywords(string token)
+    {
+        var scanner = new Scanner(token);
+        var tokens = scanner.ScanTokens();
+
+        Assert.Equal(2, tokens.Count);
+        Assert.Equal(TokenType.Identifier, tokens.First().Type);
+    }
+
+    [Theory]
+    [InlineData("@")]
+    [InlineData("#")]
+    [InlineData("$")]
+    [InlineData("%")]
+    [InlineData("^")]
+    [InlineData("&")]
+    [InlineData("`")]
+    [InlineData("~")]
+    [InlineData(@"\")]
+    [InlineData("|")]
+    [InlineData("?")]
+    [InlineData(":")]
+    [InlineData("'")]
+    [InlineData("[")]
+    [InlineData("]")]
+    public void InvalidCharacters(string invalidCharacter)
+    {
+        var scanner = new Scanner(invalidCharacter);
+        var tokens = scanner.ScanTokens();
+
+        Assert.Single(tokens);
+        Assert.Equal(TokenType.Eof, tokens.First().Type);
     }
 }
