@@ -2,11 +2,16 @@ namespace cslox.test;
 
 public class ScannerTests
 {
+    private static List<Token> ScanTokens(string tokens)
+    {
+        var scanner = new Scanner(tokens);
+        return scanner.ScanTokens();
+    }
+
     [Fact]
     public void NoTokens()
     {
-        var scanner = new Scanner(string.Empty);
-        var tokens = scanner.ScanTokens();
+        var tokens = ScanTokens(string.Empty);
 
         Assert.Single(tokens);
         Assert.Equal(TokenType.Eof, tokens.First().Type);
@@ -26,8 +31,7 @@ public class ScannerTests
     [InlineData("*", TokenType.Star)]
     public void SingleCharacterToken(string token, TokenType expectedType)
     {
-        var scanner = new Scanner(token);
-        var tokens = scanner.ScanTokens();
+        var tokens = ScanTokens(token);
 
         Assert.Equal(2, tokens.Count);
         Assert.Equal(expectedType, tokens.First().Type);
@@ -44,8 +48,7 @@ public class ScannerTests
     [InlineData("<=", TokenType.LessEqual)]
     public void OneOrTwoCharacterTokens(string token, TokenType expectedType)
     {
-        var scanner = new Scanner(token);
-        var tokens = scanner.ScanTokens();
+        var tokens = ScanTokens(token);
 
         Assert.Equal(2, tokens.Count);
         Assert.Equal(expectedType, tokens.First().Type);
@@ -58,8 +61,7 @@ public class ScannerTests
     [InlineData("my_identifier", TokenType.Identifier)]
     public void Literals(string token, TokenType expectedType)
     {
-        var scanner = new Scanner(token);
-        var tokens = scanner.ScanTokens();
+        var tokens = ScanTokens(token);
 
         Assert.Equal(2, tokens.Count);
         Assert.Equal(expectedType, tokens.First().Type);
@@ -68,8 +70,7 @@ public class ScannerTests
     [Fact]
     public void UnterminatedString()
     {
-        var scanner = new Scanner("\"unterminated string");
-        var tokens = scanner.ScanTokens();
+        var tokens = ScanTokens("\"unterminated string");
 
         Assert.Single(tokens);
         Assert.Equal(TokenType.Eof, tokens.First().Type);
@@ -94,8 +95,7 @@ public class ScannerTests
     [InlineData("while", TokenType.While)]
     public void Keywords(string token, TokenType expectedType)
     {
-        var scanner = new Scanner(token);
-        var tokens = scanner.ScanTokens();
+        var tokens = ScanTokens(token);
 
         Assert.Equal(2, tokens.Count);
         Assert.Equal(expectedType, tokens.First().Type);
@@ -116,8 +116,7 @@ public class ScannerTests
     [InlineData("sup3r")]
     public void AlmostKeywords(string token)
     {
-        var scanner = new Scanner(token);
-        var tokens = scanner.ScanTokens();
+        var tokens = ScanTokens(token);
 
         Assert.Equal(2, tokens.Count);
         Assert.Equal(TokenType.Identifier, tokens.First().Type);
@@ -141,8 +140,7 @@ public class ScannerTests
     [InlineData("]")]
     public void InvalidCharacters(string invalidCharacter)
     {
-        var scanner = new Scanner(invalidCharacter);
-        var tokens = scanner.ScanTokens();
+        var tokens = ScanTokens(invalidCharacter);
 
         Assert.Single(tokens);
         Assert.Equal(TokenType.Eof, tokens.First().Type);
