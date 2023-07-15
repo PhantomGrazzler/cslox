@@ -5,7 +5,7 @@ A Lox interpreter written in C# 10 (.NET 6), based on Bob Nystrom's excellent bo
 
 ### Tree-walk interpreter
 
-- [x] Chapter 4. [Scanning](http://craftinginterpreters.com/scanning.html)
+- [x] Chapter 4. [Scanning](http://craftinginterpreters.com/scanning.html) (Tag [Chapter4_Scanning](https://github.com/PhantomGrazzler/cslox/releases/tag/Chapter4_Scanning))
 - [ ] Chapter 5. [Representing Code](http://craftinginterpreters.com/representing-code.html)
 - [ ] Chapter 6. [Parsing Expressions](http://craftinginterpreters.com/parsing-expressions.html)
 - [ ] Chapter 7. [Evaluating Expressions](http://craftinginterpreters.com/evaluating-expressions.html)
