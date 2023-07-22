@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "cslox.generate_ast": {
+      "commandName": "Project",
+      "commandLineArgs": "../../../../cslox"
+    }
+  }
+}
