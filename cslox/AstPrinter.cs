@@ -42,10 +42,7 @@ public class AstPrinter : Expr.IVisitor<string>
     /// </summary>
     /// <param name="expr"></param>
     /// <returns></returns>
-    public string VisitLiteralExpr(Expr.Literal expr)
-    {
-        return expr.Value.ToString() ?? "nil";
-    }
+    public string VisitLiteralExpr(Expr.Literal expr) => expr.Value.ToString() ?? "nil";
 
     /// <summary>
     /// 
