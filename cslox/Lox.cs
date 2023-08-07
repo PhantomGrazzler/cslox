@@ -31,12 +31,36 @@ internal class Lox
     {
         var scanner = new Scanner(source);
         var tokens = scanner.ScanTokens();
-        tokens.ForEach(token => Console.WriteLine(token));
+        var parser = new Parser(tokens);
+        var expression = parser.Parse();
+
+        if (HadError) return;
+
+        if (expression != null)
+        {
+            Console.WriteLine(new AstPrinter().Print(expression));
+        }
+        else
+        {
+            tokens.ForEach(token => Console.WriteLine(token));
+        }
     }
 
     internal static void Error(int line, string message)
     {
         Report(line, where: "", message);
+    }
+
+    internal static void Error(Token token, string message)
+    {
+        if (token.Type == TokenType.Eof)
+        {
+            Report(token.Line, where: " at end", message);
+        }
+        else
+        {
+            Report(token.Line, where: $" at '{token.Lexeme}'", message);
+        }
     }
 
     private static void Report(int line, string where, string message)

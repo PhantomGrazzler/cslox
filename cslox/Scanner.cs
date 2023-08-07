@@ -45,21 +45,21 @@ public class Scanner
     /// <returns></returns>
     public List<Token> ScanTokens()
     {
-        while(!IsAtEnd())
+        while (!IsAtEnd())
         {
             // We are at the beginning of the next lexeme.
             m_start = m_current;
             ScanToken();
         }
 
-        m_tokens.Add(new Token(TokenType.Eof, lexeme: "", literal: new object(), m_line));
+        m_tokens.Add(new Token(TokenType.Eof, Lexeme: "", Literal: new object(), m_line));
         return m_tokens;
     }
 
     private void ScanToken()
     {
         var c = Advance();
-        switch(c)
+        switch (c)
         {
             case '(': AddToken(TokenType.LeftParen); break;
             case ')': AddToken(TokenType.RightParen); break;
@@ -78,7 +78,7 @@ public class Scanner
             case '>': AddToken(Match('=') ? TokenType.GreaterEqual : TokenType.Greater); break;
 
             case '/':
-                if(Match('/'))
+                if (Match('/'))
                 {
                     while (Peek() != '\n' && !IsAtEnd()) Advance();
                 }
@@ -100,18 +100,18 @@ public class Scanner
                 ++m_line;
                 break;
 
-            default: 
-                if(IsDigit(c))
+            default:
+                if (IsDigit(c))
                 {
                     Number();
                 }
-                else if(IsAlpha(c))
+                else if (IsAlpha(c))
                 {
                     Identifier();
                 }
                 else
                 {
-                    Lox.Error(m_line, $"Unexpected character: {c}"); 
+                    Lox.Error(m_line, $"Unexpected character: {c}");
                 }
                 break;
         };
@@ -119,7 +119,7 @@ public class Scanner
 
     private void Identifier()
     {
-        while(IsAlphaNumeric(Peek())) Advance();
+        while (IsAlphaNumeric(Peek())) Advance();
 
         var text = m_source[m_start..m_current];
         var type = m_keywords.GetValueOrDefault(text, TokenType.Identifier);
@@ -131,7 +131,7 @@ public class Scanner
         while (IsDigit(Peek())) Advance();
 
         // Look for a fractional part.
-        if(Peek() == '.' && IsDigit(PeekNext()))
+        if (Peek() == '.' && IsDigit(PeekNext()))
         {
             Advance(); // Consume the "."
 
@@ -166,13 +166,13 @@ public class Scanner
 
     private void String()
     {
-        while(Peek() != '"' && !IsAtEnd())
+        while (Peek() != '"' && !IsAtEnd())
         {
             if (Peek() == '\n') ++m_line;
             Advance();
         }
 
-        if(IsAtEnd())
+        if (IsAtEnd())
         {
             Lox.Error(m_line, "Unterminated string.");
             return;
@@ -197,8 +197,8 @@ public class Scanner
 
     private bool Match(char expected)
     {
-        if(IsAtEnd()) return false;
-        if(m_source[m_current] != expected) return false;
+        if (IsAtEnd()) return false;
+        if (m_source[m_current] != expected) return false;
 
         ++m_current;
         return true;
