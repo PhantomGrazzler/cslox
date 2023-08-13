@@ -2,23 +2,31 @@
 
 internal class ParseError : Exception
 {
-    internal ParseError(string message) : base(message)
-    {
-
-    }
+    internal ParseError(string message) : base(message) { }
 }
 
-internal class Parser
+/// <summary>
+/// 
+/// </summary>
+public class Parser
 {
     private readonly List<Token> m_tokens = new();
     private int m_currentIndex = 0;
 
-    internal Parser(List<Token> tokens)
+    /// <summary>
+    /// Construct a <see cref="Parser"/> with the provided tokens.
+    /// </summary>
+    /// <param name="tokens">Tokens to be parsed when calling <see cref="Parse"/>.</param>
+    public Parser(List<Token> tokens)
     {
         m_tokens = tokens;
     }
 
-    internal Expr? Parse()
+    /// <summary>
+    /// Parse the tokens provided when the parser was constructed.
+    /// </summary>
+    /// <returns>An expression, or <c>null</c> if there was a parsing error.</returns>
+    public Expr? Parse()
     {
         try
         {
