@@ -8,7 +8,7 @@ A Lox interpreter written in C# 10 (.NET 6), based on Bob Nystrom's excellent bo
 - [x] Chapter 4. [Scanning](http://craftinginterpreters.com/scanning.html) (Tag [Chapter4_Scanning](https://github.com/PhantomGrazzler/cslox/releases/tag/Chapter4_Scanning))
 - [x] Chapter 5. [Representing Code](http://craftinginterpreters.com/representing-code.html) (Tag [Chapter5_RepresentingCode](https://github.com/PhantomGrazzler/cslox/releases/tag/Chapter5_RepresentingCode))
 - [x] Chapter 6. [Parsing Expressions](http://craftinginterpreters.com/parsing-expressions.html) (Tag [Chapter6_ParsingExpressions](https://github.com/PhantomGrazzler/cslox/releases/tag/Chapter6_ParsingExpressions))
-- [ ] Chapter 7. [Evaluating Expressions](http://craftinginterpreters.com/evaluating-expressions.html)
+- [x] Chapter 7. [Evaluating Expressions](http://craftinginterpreters.com/evaluating-expressions.html) (Tag [Chapter7_EvaluatingExpressions](https://github.com/PhantomGrazzler/cslox/releases/tag/Chapter7_EvaluatingExpressions))
 - [ ] Chapter 8. [Statements and State](http://craftinginterpreters.com/statements-and-state.html)
 - [ ] Chapter 9. [Control Flow](http://craftinginterpreters.com/control-flow.html)
 - [ ] Chapter 10. [Functions](http://craftinginterpreters.com/functions.html)
