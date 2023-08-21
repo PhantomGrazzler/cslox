@@ -7,7 +7,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cslox", "cslox\cslox.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cslox.test", "cslox.test\cslox.test.csproj", "{37034237-CF7B-4D53-BD18-E91678239FB9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cslox.generate_ast", "cslox.generate_ast\cslox.generate_ast.csproj", "{6998FDAF-CCFF-4B13-9D62-489D4861760C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cslox.generate_ast", "cslox.generate_ast\cslox.generate_ast.csproj", "{6998FDAF-CCFF-4B13-9D62-489D4861760C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D3A92E2B-4231-4F97-8BB8-858897D04525}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
