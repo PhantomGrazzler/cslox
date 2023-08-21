@@ -1,18 +1,18 @@
 ﻿namespace cslox;
 
-internal class Lox
+internal sealed class Lox
 {
+    private static readonly Interpreter Interpreter = new();
     private static bool HadError = false;
+    private static bool HadRuntimeError = false;
 
     internal static void RunFile(string path)
     {
         var file = File.OpenText(path);
         Run(file.ReadToEnd());
 
-        if (HadError)
-        {
-            Environment.Exit(65);
-        }
+        if (HadError) Environment.Exit(65);
+        if (HadRuntimeError) Environment.Exit(70);
     }
 
     internal static void RunPrompt()
@@ -34,8 +34,11 @@ internal class Lox
         var parser = new Parser(tokens);
         var expression = parser.Parse();
 
-        if (HadError) return;
+        if (HadError || expression == null) return;
 
+        Interpreter.Interpret(expression);
+
+        /*
         if (expression != null)
         {
             Console.WriteLine(new AstPrinter().Print(expression));
@@ -44,6 +47,7 @@ internal class Lox
         {
             tokens.ForEach(token => Console.WriteLine(token));
         }
+        */
     }
 
     internal static void Error(int line, string message)
@@ -67,5 +71,12 @@ internal class Lox
     {
         Console.Error.WriteLine($"[line {line}] Error {where}: {message}");
         HadError = true;
+    }
+
+    internal static void RuntimeError(RuntimeError error)
+    {
+        Console.Error.WriteLine(error.Message);
+        Console.Error.WriteLine($"[line {error.Token.Line}]");
+        HadRuntimeError = true;
     }
 }
