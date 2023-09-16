@@ -5,12 +5,18 @@ public class ParserTests
     private static Expr? Parse(string source)
     {
         var tokens = new Scanner(source).ScanTokens();
-        return new Parser(tokens).Parse();
+        var statements = new Parser(tokens).Parse();
+        if(statements.Count > 0 && statements.First() is Stmt.ExpressionStatement statementExpression)
+        {
+            return statementExpression.Expression;
+        }
+        else
+        {
+            return null;
+        }
     }
 
-    [InlineData("")]
     [InlineData(";")]
-    [InlineData(" ")]
     [InlineData("var")]
     [InlineData("(1")]
     [InlineData("1+")]
@@ -21,7 +27,7 @@ public class ParserTests
     [Theory]
     public void InvalidExpressions(string source)
     {
-        Assert.Null(Parse(source));
+        _ = Assert.Throws<ParseError>(() => Parse(source));
     }
 
     [InlineData("nil", null)]
@@ -35,7 +41,7 @@ public class ParserTests
     [Theory]
     public void ValidLiterals(string source, object? expectedValue)
     {
-        var expression = Parse(source);
+        var expression = Parse($"{source};");
         Assert.NotNull(expression);
 
         var literal = expression as Expr.Literal;
@@ -58,7 +64,7 @@ public class ParserTests
     public void BinaryExpressions(
         string lhsString, string op, string rhsString, object? lhsExpected, TokenType opExpected, object? rhsExpected)
     {
-        var expression = Parse($"{lhsString} {op} {rhsString}");
+        var expression = Parse($"{lhsString} {op} {rhsString};");
         Assert.NotNull(expression);
 
         var equality = expression as Expr.Binary;
@@ -83,7 +89,7 @@ public class ParserTests
     [Theory]
     public void UnaryExpressions(string op, string rhsString, TokenType opExpected, object? rhsExpected)
     {
-        var expression = Parse($"{op}{rhsString}");
+        var expression = Parse($"{op}{rhsString};");
         Assert.NotNull(expression);
 
         var unary = expression as Expr.Unary;
@@ -102,7 +108,7 @@ public class ParserTests
     [Fact]
     public void GroupingExpression()
     {
-        var expression = Parse("(75)");
+        var expression = Parse("(75);");
         Assert.NotNull(expression);
 
         var grouping = expression as Expr.Grouping;
@@ -116,7 +122,7 @@ public class ParserTests
     [Fact]
     public void NestedGroupingExpression()
     {
-        var expression = Parse("((true))");
+        var expression = Parse("((true));");
         Assert.NotNull(expression);
 
         var outerGrouping = expression as Expr.Grouping;

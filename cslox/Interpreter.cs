@@ -27,22 +27,30 @@ public sealed class RuntimeError : Exception
 /// 
 /// </summary>
 public class Interpreter : Expr.IVisitor<object?>
+                         , Stmt.IVisitor<object?>
 {
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="expression"></param>
-    public void Interpret(Expr expression)
+    /// <param name="statements"></param>
+    public void Interpret(IEnumerable<Stmt> statements)
     {
         try
         {
-            var value = Evaluate(expression);
-            Console.WriteLine(Stringify(value));
+            foreach (Stmt statement in statements)
+            {
+                Execute(statement);
+            }
         }
         catch(RuntimeError e)
         {
             Lox.RuntimeError(e);
         }
+    }
+
+    private void Execute(Stmt statement)
+    {
+        _ = statement.Accept(this);
     }
 
     /// <summary>
@@ -195,5 +203,28 @@ public class Interpreter : Expr.IVisitor<object?>
         }
 
         return value.ToString() ?? "";
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="stmt"></param>
+    /// <returns></returns>
+    public object? VisitExpressionStatementStmt(Stmt.ExpressionStatement stmt)
+    {
+        _ = Evaluate(stmt.Expression);
+        return null;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="stmt"></param>
+    /// <returns></returns>
+    public object? VisitPrintStmt(Stmt.Print stmt)
+    {
+        var value = Evaluate(stmt.Expression);
+        Console.WriteLine(Stringify(value));
+        return null;
     }
 }

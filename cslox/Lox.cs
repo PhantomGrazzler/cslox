@@ -32,22 +32,11 @@ internal sealed class Lox
         var scanner = new Scanner(source);
         var tokens = scanner.ScanTokens();
         var parser = new Parser(tokens);
-        var expression = parser.Parse();
+        var statements = parser.Parse();
 
-        if (HadError || expression == null) return;
+        if (HadError) return;
 
-        Interpreter.Interpret(expression);
-
-        /*
-        if (expression != null)
-        {
-            Console.WriteLine(new AstPrinter().Print(expression));
-        }
-        else
-        {
-            tokens.ForEach(token => Console.WriteLine(token));
-        }
-        */
+        Interpreter.Interpret(statements);
     }
 
     internal static void Error(int line, string message)
@@ -59,11 +48,11 @@ internal sealed class Lox
     {
         if (token.Type == TokenType.Eof)
         {
-            Report(token.Line, where: " at end", message);
+            Report(token.Line, where: "at end", message);
         }
         else
         {
-            Report(token.Line, where: $" at '{token.Lexeme}'", message);
+            Report(token.Line, where: $"at '{token.Lexeme}'", message);
         }
     }
 

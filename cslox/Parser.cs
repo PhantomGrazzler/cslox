@@ -1,8 +1,15 @@
 ﻿namespace cslox;
 
-internal class ParseError : Exception
+/// <summary>
+/// Exception thrown by the parser if it fails to parse the provided input.
+/// </summary>
+public class ParseError : Exception
 {
-    internal ParseError(string message) : base(message) { }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="message"></param>
+    public ParseError(string message) : base(message) { }
 }
 
 /// <summary>
@@ -26,16 +33,36 @@ public class Parser
     /// Parse the tokens provided when the parser was constructed.
     /// </summary>
     /// <returns>An expression, or <c>null</c> if there was a parsing error.</returns>
-    public Expr? Parse()
+    public List<Stmt> Parse()
     {
-        try
+        var statements = new List<Stmt>();
+        while(!IsAtEnd())
         {
-            return Expression();
+            statements.Add(Statement());
         }
-        catch (ParseError)
-        {
-            return null;
-        }
+
+        return statements;
+    }
+
+    private Stmt Statement()
+    {
+        if (Match(TokenType.Print)) return PrintStatement();
+
+        return ExpressionStatement();
+    }
+
+    private Stmt PrintStatement()
+    {
+        var value = Expression();
+        _ = Consume(TokenType.Semicolon, "Expected ';' after value.");
+        return new Stmt.Print(value);
+    }
+
+    private Stmt ExpressionStatement()
+    {
+        var expr = Expression();
+        _ = Consume(TokenType.Semicolon, "Expected ';' after expression.");
+        return new Stmt.ExpressionStatement(expr);
     }
 
     private Expr Expression() => Equality();

@@ -15,6 +15,12 @@ DefineAst(outputDirectory, "Expr", new List<string>
     "Unary      : Token Operator, Expr Right",
 });
 
+DefineAst(outputDirectory, "Stmt", new List<string>
+{
+    "ExpressionStatement    : Expr Expression",
+    "Print                  : Expr Expression",
+});
+
 static void DefineAst(string outputDirectory, string baseName, List<string> types)
 {
     const string indent = "    ";
