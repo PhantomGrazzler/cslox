@@ -1,6 +1,7 @@
 # cslox
 
 [![.NET](https://github.com/PhantomGrazzler/cslox/actions/workflows/dotnet.yml/badge.svg?branch=main)](https://github.com/PhantomGrazzler/cslox/actions/workflows/dotnet.yml)
+[![CodeQL](https://github.com/PhantomGrazzler/cslox/actions/workflows/codeql.yml/badge.svg)](https://github.com/PhantomGrazzler/cslox/actions/workflows/codeql.yml)
 
 A Lox interpreter written in C# 10 (.NET 6), based on Bob Nystrom's excellent book [Crafting Interpreters](http://craftinginterpreters.com/). The associated GitHub repo for the book is [https://github.com/munificent/craftinginterpreters](https://github.com/munificent/craftinginterpreters).
 
