@@ -2,11 +2,14 @@
 
 public class ParserTests
 {
-    private static Expr? Parse(string source)
+
+    #region Expressions
+
+    private static Expr? ParseExpression(string source)
     {
         var tokens = new Scanner(source).ScanTokens();
         var statements = new Parser(tokens).Parse();
-        if(statements.Count > 0 && statements.First() is Stmt.ExpressionStatement statementExpression)
+        if (statements.Count > 0 && statements.First() is Stmt.ExpressionStatement statementExpression)
         {
             return statementExpression.Expression;
         }
@@ -27,7 +30,7 @@ public class ParserTests
     [Theory]
     public void InvalidExpressions(string source)
     {
-        _ = Assert.Throws<ParseError>(() => Parse(source));
+        _ = Assert.Throws<ParseError>(() => ParseExpression(source));
     }
 
     [InlineData("nil", null)]
@@ -41,7 +44,7 @@ public class ParserTests
     [Theory]
     public void ValidLiterals(string source, object? expectedValue)
     {
-        var expression = Parse($"{source};");
+        var expression = ParseExpression($"{source};");
         Assert.NotNull(expression);
 
         var literal = expression as Expr.Literal;
@@ -64,7 +67,7 @@ public class ParserTests
     public void BinaryExpressions(
         string lhsString, string op, string rhsString, object? lhsExpected, TokenType opExpected, object? rhsExpected)
     {
-        var expression = Parse($"{lhsString} {op} {rhsString};");
+        var expression = ParseExpression($"{lhsString} {op} {rhsString};");
         Assert.NotNull(expression);
 
         var equality = expression as Expr.Binary;
@@ -89,7 +92,7 @@ public class ParserTests
     [Theory]
     public void UnaryExpressions(string op, string rhsString, TokenType opExpected, object? rhsExpected)
     {
-        var expression = Parse($"{op}{rhsString};");
+        var expression = ParseExpression($"{op}{rhsString};");
         Assert.NotNull(expression);
 
         var unary = expression as Expr.Unary;
@@ -108,7 +111,7 @@ public class ParserTests
     [Fact]
     public void GroupingExpression()
     {
-        var expression = Parse("(75);");
+        var expression = ParseExpression("(75);");
         Assert.NotNull(expression);
 
         var grouping = expression as Expr.Grouping;
@@ -122,7 +125,7 @@ public class ParserTests
     [Fact]
     public void NestedGroupingExpression()
     {
-        var expression = Parse("((true));");
+        var expression = ParseExpression("((true));");
         Assert.NotNull(expression);
 
         var outerGrouping = expression as Expr.Grouping;
@@ -135,4 +138,67 @@ public class ParserTests
         Assert.NotNull(literal);
         Assert.Equal(true, literal.Value);
     }
+
+    #endregion Expressions
+
+    #region Statements
+
+    private static List<Stmt> Parse(string source)
+    {
+        var tokens = new Scanner(source).ScanTokens();
+        return new Parser(tokens).Parse();
+    }
+
+    [InlineData("print \"one\";")]
+    [InlineData("print true;")]
+    [InlineData("print 2 + 1;")]
+    [InlineData("print (2 + 1 * 4 - 9 / 3);")]
+    [Theory]
+    public void ValidPrintStatements(string source)
+    {
+        var statements = Parse(source);
+        var statement = Assert.Single(statements);
+        Assert.True(statement is Stmt.Print);
+    }
+
+    [InlineData("Print \"one\";")]
+    [InlineData("prinT true;")]
+    [InlineData("print var;")]
+    [InlineData("print (2 + 1 * 4 - 9 / 3;")]
+    [InlineData("print;")]
+    [InlineData("print false")]
+    [InlineData("print (print true);")]
+    [Theory]
+    public void InvalidPrintStatements(string source)
+    {
+        _ = Assert.Throws<ParseError>(() => Parse(source));
+    }
+
+    [InlineData("\"one\";")]
+    [InlineData("true;")]
+    [InlineData("2 + 1;")]
+    [InlineData("(2 + 1 * 4 - 9 / 3);")]
+    [InlineData("!true;")]
+    [InlineData("-8;")]
+    [Theory]
+    public void ValidExpressionStatements(string source)
+    {
+        var statements = Parse(source);
+        var statement = Assert.Single(statements);
+        Assert.True(statement is Stmt.ExpressionStatement);
+    }
+
+    // [InlineData("\"one;")] - this calls Lox.Error, but does not throw an exception.
+    [InlineData("true")]
+    [InlineData("var;")]
+    [InlineData("(2 + 1 * 4 - 9 / 3;")]
+    [InlineData(";")]
+    [Theory]
+    public void InvalidExpressionStatements(string source)
+    {
+        _ = Assert.Throws<ParseError>(() => Parse(source));
+    }
+
+    #endregion Statements
+
 }
