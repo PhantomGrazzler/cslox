@@ -30,7 +30,7 @@ public class ParserTests
     [Theory]
     public void InvalidExpressions(string source)
     {
-        _ = Assert.Throws<ParseError>(() => ParseExpression(source));
+        Assert.Null(ParseExpression(source));
     }
 
     [InlineData("nil", null)]
@@ -143,7 +143,7 @@ public class ParserTests
 
     #region Statements
 
-    private static List<Stmt> Parse(string source)
+    private static List<Stmt?> Parse(string source)
     {
         var tokens = new Scanner(source).ScanTokens();
         return new Parser(tokens).Parse();
@@ -171,7 +171,9 @@ public class ParserTests
     [Theory]
     public void InvalidPrintStatements(string source)
     {
-        _ = Assert.Throws<ParseError>(() => Parse(source));
+        var statements = Parse(source);
+        _ = Assert.Single(statements);
+        Assert.Contains(null, statements);
     }
 
     [InlineData("\"one\";")]
@@ -188,7 +190,7 @@ public class ParserTests
         Assert.True(statement is Stmt.ExpressionStatement);
     }
 
-    // [InlineData("\"one;")] - this calls Lox.Error, but does not throw an exception.
+    // [InlineData("\"one;")] // - this calls Lox.Error, but does not throw an exception.
     [InlineData("true")]
     [InlineData("var;")]
     [InlineData("(2 + 1 * 4 - 9 / 3;")]
@@ -196,7 +198,9 @@ public class ParserTests
     [Theory]
     public void InvalidExpressionStatements(string source)
     {
-        _ = Assert.Throws<ParseError>(() => Parse(source));
+        var statements = Parse(source);
+        _ = Assert.Single(statements);
+        Assert.Contains(null, statements);
     }
 
     #endregion Statements

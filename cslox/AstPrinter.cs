@@ -54,16 +54,23 @@ public class AstPrinter : Expr.IVisitor<string>
         return Parenthesize(expr.Operator.Lexeme, expr.Right);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="expr"></param>
+    /// <returns></returns>
+    public string VisitVariableExpr(Expr.Variable expr) => $"{expr.Name}";
+
     private string Parenthesize(string name, params Expr[] exprs)
     {
         var builder = new StringBuilder();
 
-        builder.Append('(').Append(name);
+        _ = builder.Append('(').Append(name);
         foreach (var expr in exprs)
         {
-            builder.Append(' ').Append(expr.Accept(this));
+            _ = builder.Append(' ').Append(expr.Accept(this));
         }
-        builder.Append(')');
+        _ = builder.Append(')');
 
         return builder.ToString();
     }

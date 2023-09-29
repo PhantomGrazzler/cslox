@@ -32,16 +32,34 @@ public class Parser
     /// <summary>
     /// Parse the tokens provided when the parser was constructed.
     /// </summary>
-    /// <returns>An expression, or <c>null</c> if there was a parsing error.</returns>
-    public List<Stmt> Parse()
+    /// <returns>A collection of statements which can be <c>null</c> if there was a parsing error.</returns>
+    public List<Stmt?> Parse()
     {
-        var statements = new List<Stmt>();
+        var statements = new List<Stmt?>();
         while(!IsAtEnd())
         {
-            statements.Add(Statement());
+            statements.Add(Declaration());
         }
 
         return statements;
+    }
+
+    private Stmt? Declaration()
+    {
+        try
+        {
+            if(Match(TokenType.Var))
+            {
+                return VarDeclaration();
+            }
+
+            return Statement();
+        }
+        catch (ParseError)
+        {
+            Synchronise();
+            return null;
+        }
     }
 
     private Stmt Statement()
@@ -56,6 +74,15 @@ public class Parser
         var value = Expression();
         _ = Consume(TokenType.Semicolon, "Expected ';' after value.");
         return new Stmt.Print(value);
+    }
+
+    private Stmt VarDeclaration()
+    {
+        var name = Consume(TokenType.Identifier, "Expected a variable name.");
+        var initializer = Match(TokenType.Equal) ? Expression() : null;
+        _ = Consume(TokenType.Semicolon, "Expected ';' after variable declaration.");
+
+        return new Stmt.Var(name, initializer);
     }
 
     private Stmt ExpressionStatement()
@@ -137,6 +164,7 @@ public class Parser
         if (Match(TokenType.False)) return new Expr.Literal(false);
         if (Match(TokenType.Nil)) return new Expr.Literal(null);
         if (Match(TokenType.Number, TokenType.String)) return new Expr.Literal(Previous().Literal);
+        if (Match(TokenType.Identifier)) return new Expr.Variable(Previous());
 
         if (Match(TokenType.LeftParen))
         {
@@ -163,7 +191,7 @@ public class Parser
 
     private void Synchronise()
     {
-        Advance();
+        _ = Advance();
 
         while (!IsAtEnd())
         {
@@ -181,9 +209,9 @@ public class Parser
                 case TokenType.While:
                     return;
             }
-        }
 
-        Advance();
+            _ = Advance();
+        }
     }
 
     private bool Match(params TokenType[] types)

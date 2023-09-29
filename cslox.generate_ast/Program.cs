@@ -13,12 +13,14 @@ DefineAst(outputDirectory, "Expr", new List<string>
     "Grouping   : Expr Expression",
     "Literal    : object? Value",
     "Unary      : Token Operator, Expr Right",
+    "Variable   : Token Name",
 });
 
 DefineAst(outputDirectory, "Stmt", new List<string>
 {
     "ExpressionStatement    : Expr Expression",
     "Print                  : Expr Expression",
+    "Var                    : Token Name, Expr? Initializer",
 });
 
 static void DefineAst(string outputDirectory, string baseName, List<string> types)

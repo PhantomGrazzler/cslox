@@ -29,15 +29,17 @@ public sealed class RuntimeError : Exception
 public class Interpreter : Expr.IVisitor<object?>
                          , Stmt.IVisitor<object?>
 {
+    private readonly LoxEnvironment m_environment = new();
+
     /// <summary>
     /// 
     /// </summary>
     /// <param name="statements"></param>
-    public void Interpret(IEnumerable<Stmt> statements)
+    public void Interpret(IEnumerable<Stmt?> statements)
     {
         try
         {
-            foreach (Stmt statement in statements)
+            foreach (var statement in statements)
             {
                 Execute(statement);
             }
@@ -48,9 +50,9 @@ public class Interpreter : Expr.IVisitor<object?>
         }
     }
 
-    private void Execute(Stmt statement)
+    private void Execute(Stmt? statement)
     {
-        _ = statement.Accept(this);
+        _ = statement?.Accept(this);
     }
 
     /// <summary>
@@ -151,6 +153,16 @@ public class Interpreter : Expr.IVisitor<object?>
         return null;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="expr"></param>
+    /// <returns></returns>
+    public object? VisitVariableExpr(Expr.Variable expr)
+    {
+        return m_environment.Get(expr.Name);
+    }
+
     private object? Evaluate(Expr expr)
     {
         return expr.Accept(this);
@@ -209,7 +221,7 @@ public class Interpreter : Expr.IVisitor<object?>
     /// 
     /// </summary>
     /// <param name="stmt"></param>
-    /// <returns></returns>
+    /// <returns><c>null</c></returns>
     public object? VisitExpressionStatementStmt(Stmt.ExpressionStatement stmt)
     {
         _ = Evaluate(stmt.Expression);
@@ -220,11 +232,23 @@ public class Interpreter : Expr.IVisitor<object?>
     /// 
     /// </summary>
     /// <param name="stmt"></param>
-    /// <returns></returns>
+    /// <returns><c>null</c></returns>
     public object? VisitPrintStmt(Stmt.Print stmt)
     {
         var value = Evaluate(stmt.Expression);
         Console.WriteLine(Stringify(value));
+        return null;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="stmt"></param>
+    /// <returns><c>null</c></returns>
+    public object? VisitVarStmt(Stmt.Var stmt)
+    {
+        var value = stmt.Initializer != null ? Evaluate(stmt.Initializer) : null;
+        m_environment.Define(stmt.Name.Lexeme, value);
         return null;
     }
 }
