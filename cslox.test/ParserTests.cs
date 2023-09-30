@@ -139,6 +139,61 @@ public class ParserTests
         Assert.Equal(true, literal.Value);
     }
 
+    [InlineData("v;", "v")]
+    [InlineData("beverage;", "beverage")]
+    [Theory]
+    public void VariableExpression(string source, string expectedName)
+    {
+        var statements = Parse(source);
+        var statement = Assert.Single(statements);
+        Assert.NotNull(statement);
+
+        if (statement is Stmt.ExpressionStatement exprStatement)
+        {
+            if (exprStatement.Expression is Expr.Variable variable)
+            {
+                Assert.Equal(expectedName, variable.Name.Lexeme);
+            }
+            else
+            {
+                Assert.Fail($"{source} does not contain a variable expression.");
+            }
+        }
+        else
+        {
+            Assert.Fail($"{source} is not an expression statement.");
+        }
+    }
+
+    [InlineData("var a=1;", "a", 1.0)]
+    [InlineData("var beverage = \"espresso\";", "beverage", "espresso")]
+    [InlineData("var null = nil;", "null", null)]
+    [Theory]
+    public void LiteralAssignmentExpression(string source, string expectedName, object? expectedValue)
+    {
+        var statements = Parse(source);
+        var statement = Assert.Single(statements);
+        Assert.NotNull(statement);
+
+        if (statement is Stmt.Var varStatement)
+        {
+            Assert.Equal(expectedName, varStatement.Name.Lexeme);
+
+            if (varStatement.Initializer is Expr.Literal value)
+            {
+                Assert.Equal(expectedValue, value.Value);
+            }
+            else
+            {
+                Assert.Fail($"Assignment value is not a literal.");
+            }
+        }
+        else
+        {
+            Assert.Fail($"{source} is not an expression statement.");
+        }
+    }
+
     #endregion Expressions
 
     #region Statements
@@ -197,6 +252,56 @@ public class ParserTests
     [InlineData(";")]
     [Theory]
     public void InvalidExpressionStatements(string source)
+    {
+        var statements = Parse(source);
+        _ = Assert.Single(statements);
+        Assert.Contains(null, statements);
+    }
+
+    [InlineData("var a=1;")]
+    [InlineData("var a;")]
+    [InlineData("var beverage = \"espresso\";")]
+    [InlineData("var a=b;")]
+    [Theory]
+    public void ValidVariableDeclarations(string source)
+    {
+        var statements = Parse(source);
+        var statement = Assert.Single(statements);
+        Assert.True(statement is Stmt.Var);
+    }
+
+    [InlineData("var;")]
+    [InlineData("var g=;")]
+    [InlineData("var g=var;")]
+    [InlineData("var p=print;")]
+    [Theory]
+    public void InvalidVariableDeclarations(string source)
+    {
+        var statements = Parse(source);
+        _ = Assert.Single(statements);
+        Assert.Contains(null, statements);
+    }
+
+    [InlineData("{}", 0)]
+    [InlineData("{ var a=1; }", 1)]
+    [InlineData("{{}}", 1)]
+    [InlineData("{print a; print b; var c=7; a+b+c;}", 4)]
+    [Theory]
+    public void BlockStatements(string source, int numberExpectedStatements)
+    {
+        var statements = Parse(source);
+        var statement = Assert.Single(statements);
+
+        var blockStatement = statement as Stmt.Block;
+        Assert.NotNull(blockStatement);
+        Assert.Equal(numberExpectedStatements, blockStatement.Statements.Count);
+    }
+
+    [InlineData("{")]
+    [InlineData("}")]
+    [InlineData("{{}")]
+    [Theory]
+    public void InvalidBlockStatements(string source)
     {
         var statements = Parse(source);
         _ = Assert.Single(statements);

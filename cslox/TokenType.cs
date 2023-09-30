@@ -1,7 +1,7 @@
 ﻿namespace cslox;
 
 /// <summary>
-/// TODO
+/// Valid token types in the Lox grammar.
 /// </summary>
 public enum TokenType
 {

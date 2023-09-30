@@ -29,7 +29,7 @@ public sealed class RuntimeError : Exception
 public class Interpreter : Expr.IVisitor<object?>
                          , Stmt.IVisitor<object?>
 {
-    private readonly LoxEnvironment m_environment = new();
+    private LoxEnvironment m_environment = new();
 
     /// <summary>
     /// 
@@ -44,7 +44,7 @@ public class Interpreter : Expr.IVisitor<object?>
                 Execute(statement);
             }
         }
-        catch(RuntimeError e)
+        catch (RuntimeError e)
         {
             Lox.RuntimeError(e);
         }
@@ -65,7 +65,7 @@ public class Interpreter : Expr.IVisitor<object?>
         var lhs = Evaluate(expr.Left);
         var rhs = Evaluate(expr.Right);
 
-        switch(expr.Operator.Type)
+        switch (expr.Operator.Type)
         {
             case TokenType.EqualEqual:
                 return IsEqual(lhs, rhs);
@@ -93,11 +93,11 @@ public class Interpreter : Expr.IVisitor<object?>
                 CheckNumberOperands(expr.Operator, lhs, rhs);
                 return (double)lhs * (double)rhs;
             case TokenType.Plus:
-                if(lhs is double lhsDouble && rhs is double rhsDouble)
+                if (lhs is double lhsDouble && rhs is double rhsDouble)
                 {
                     return lhsDouble + rhsDouble;
                 }
-                else if(lhs is string lhsString && rhs is string rhsString)
+                else if (lhs is string lhsString && rhs is string rhsString)
                 {
                     return string.Concat(lhsString, rhsString);
                 }
@@ -139,7 +139,7 @@ public class Interpreter : Expr.IVisitor<object?>
     {
         var rhs = Evaluate(expr.Right);
 
-        switch(expr.Operator.Type)
+        switch (expr.Operator.Type)
         {
             case TokenType.Bang:
                 return !IsTruthy(rhs);
@@ -196,7 +196,7 @@ public class Interpreter : Expr.IVisitor<object?>
 
     private static void CheckNumberOperands(Token op, [NotNull] object? lhs, [NotNull] object? rhs)
     {
-        if(lhs is double && rhs is double) return;
+        if (lhs is double && rhs is double) return;
         throw new RuntimeError(op, $"Operands (lhs={lhs}, rhs={rhs}) must be numbers.");
     }
 
@@ -204,10 +204,10 @@ public class Interpreter : Expr.IVisitor<object?>
     {
         if (value == null) return "nil";
 
-        if(value is double doubleValue)
+        if (value is double doubleValue)
         {
             string text = doubleValue.ToString();
-            if(text.EndsWith(".0"))
+            if (text.EndsWith(".0"))
             {
                 text = text[0..^2];
             }
@@ -262,5 +262,34 @@ public class Interpreter : Expr.IVisitor<object?>
         var value = Evaluate(expr.Value);
         m_environment.Assign(expr.Name, value);
         return value;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="stmt"></param>
+    /// <returns><c>null</c></returns>
+    public object? VisitBlockStmt(Stmt.Block stmt)
+    {
+        ExecuteBlock(stmt.Statements, new LoxEnvironment(m_environment));
+        return null;
+    }
+
+    private void ExecuteBlock(List<Stmt?> statements, LoxEnvironment environment)
+    {
+        var previousEnvironment = m_environment;
+
+        try
+        {
+            m_environment = environment;
+            foreach (var statement in statements)
+            {
+                Execute(statement);
+            }
+        }
+        finally
+        {
+            m_environment = previousEnvironment;
+        }
     }
 }

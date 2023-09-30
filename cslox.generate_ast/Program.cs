@@ -1,6 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-if(args.Length != 1)
+if (args.Length != 1)
 {
     Console.WriteLine("Usage: generate_ast <output directory>\n");
     throw new ArgumentException("Invalid number of arguments provided", nameof(args));
@@ -19,6 +19,7 @@ DefineAst(outputDirectory, "Expr", new List<string>
 
 DefineAst(outputDirectory, "Stmt", new List<string>
 {
+    "Block                  : List<Stmt?> Statements",
     "ExpressionStatement    : Expr Expression",
     "Print                  : Expr Expression",
     "Var                    : Token Name, Expr? Initializer",
@@ -44,7 +45,7 @@ static void DefineAst(string outputDirectory, string baseName, List<string> type
     writer.WriteLine($"{indent}public abstract R Accept<R>(IVisitor<R> visitor);");
     writer.WriteLine();
 
-    foreach ( var type in types )
+    foreach (var type in types)
     {
         var typeComponents = type.Split(':', StringSplitOptions.TrimEntries);
         if (typeComponents.Length != 2)
@@ -80,7 +81,7 @@ static void DefineVisitor(StreamWriter writer, string baseName, List<string> typ
     const string indent = "    ";
     writer.WriteLine($"{indent}public interface IVisitor<R>");
     writer.WriteLine($"{indent}{{");
-    foreach(var type in types )
+    foreach (var type in types)
     {
         var typeName = type.Split(':', StringSplitOptions.TrimEntries)[0];
         writer.WriteLine($"{indent}{indent}R Visit{typeName}{baseName}({typeName} {baseName.ToLower()});");
