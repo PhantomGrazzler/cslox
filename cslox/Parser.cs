@@ -36,7 +36,7 @@ public class Parser
     public List<Stmt?> Parse()
     {
         var statements = new List<Stmt?>();
-        while(!IsAtEnd())
+        while (!IsAtEnd())
         {
             statements.Add(Declaration());
         }
@@ -48,7 +48,7 @@ public class Parser
     {
         try
         {
-            if(Match(TokenType.Var))
+            if (Match(TokenType.Var))
             {
                 return VarDeclaration();
             }
@@ -92,7 +92,28 @@ public class Parser
         return new Stmt.ExpressionStatement(expr);
     }
 
-    private Expr Expression() => Equality();
+    private Expr Expression() => Assignment();
+
+    private Expr Assignment()
+    {
+        var expr = Equality();
+
+        if (Match(TokenType.Equal))
+        {
+            var equals = Previous();
+            var value = Assignment();
+
+            if (expr is Expr.Variable variable)
+            {
+                var name = variable.Name;
+                return new Expr.Assign(name, value);
+            }
+
+            _ = Error(token: equals, $"Invalid assignment target: {equals.Lexeme}.");
+        }
+
+        return expr;
+    }
 
     private Expr Equality()
     {

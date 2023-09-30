@@ -2,6 +2,8 @@
 
 public class AstPrinterTests
 {
+    private readonly AstPrinter m_astPrinter = new();
+
     [Fact]
     public void SimpleExpression()
     {
@@ -14,6 +16,26 @@ public class AstPrinterTests
                 new Expr.Literal(45.67))
             );
 
-        Assert.Equal("(* (- 123) (group 45.67))", new AstPrinter().Print(expression));
+        Assert.Equal("(* (- 123) (group 45.67))", m_astPrinter.Print(expression));
+    }
+
+    [Fact]
+    public void VariableDeclaration()
+    {
+        var expression = new Expr.Assign(
+            new Token(TokenType.Identifier, "var_name", new(), 1),
+            new Expr.Unary(
+                new Token(TokenType.Minus, "-", new(), 1),
+                new Expr.Literal(123)));
+
+        Assert.Equal("var_name = (- 123)", m_astPrinter.Print(expression));
+    }
+
+    [Fact]
+    public void AssignmentExpression()
+    {
+        var expression = new Expr.Variable(new Token(TokenType.Identifier, "var_name", new(), 1));
+
+        Assert.Equal("var var_name", m_astPrinter.Print(expression));
     }
 }

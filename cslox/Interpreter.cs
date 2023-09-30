@@ -251,4 +251,16 @@ public class Interpreter : Expr.IVisitor<object?>
         m_environment.Define(stmt.Name.Lexeme, value);
         return null;
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="expr"></param>
+    /// <returns>The value being assigned</returns>
+    public object? VisitAssignExpr(Expr.Assign expr)
+    {
+        var value = Evaluate(expr.Value);
+        m_environment.Assign(expr.Name, value);
+        return value;
+    }
 }

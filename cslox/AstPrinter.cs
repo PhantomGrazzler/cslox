@@ -22,6 +22,13 @@ public class AstPrinter : Expr.IVisitor<string>
     /// </summary>
     /// <param name="expr"></param>
     /// <returns></returns>
+    public string VisitAssignExpr(Expr.Assign expr) => $"{expr.Name.Lexeme} = {expr.Value.Accept(this)}";
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="expr"></param>
+    /// <returns></returns>
     public string VisitBinaryExpr(Expr.Binary expr)
     {
         return Parenthesize(expr.Operator.Lexeme, expr.Left, expr.Right);
@@ -59,7 +66,7 @@ public class AstPrinter : Expr.IVisitor<string>
     /// </summary>
     /// <param name="expr"></param>
     /// <returns></returns>
-    public string VisitVariableExpr(Expr.Variable expr) => $"{expr.Name}";
+    public string VisitVariableExpr(Expr.Variable expr) => $"var {expr.Name.Lexeme}";
 
     private string Parenthesize(string name, params Expr[] exprs)
     {

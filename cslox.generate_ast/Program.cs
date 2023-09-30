@@ -9,6 +9,7 @@ if(args.Length != 1)
 var outputDirectory = args[0];
 DefineAst(outputDirectory, "Expr", new List<string>
 {
+    "Assign     : Token Name, Expr Value",
     "Binary     : Expr Left, Token Operator, Expr Right",
     "Grouping   : Expr Expression",
     "Literal    : object? Value",
