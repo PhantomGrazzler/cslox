@@ -12,10 +12,7 @@ public class AstPrinter : Expr.IVisitor<string>
     /// </summary>
     /// <param name="expr"></param>
     /// <returns></returns>
-    public string Print(Expr expr)
-    {
-        return expr.Accept(this);
-    }
+    public string Print(Expr expr) => expr.Accept(this);
 
     /// <summary>
     /// 
@@ -29,20 +26,14 @@ public class AstPrinter : Expr.IVisitor<string>
     /// </summary>
     /// <param name="expr"></param>
     /// <returns></returns>
-    public string VisitBinaryExpr(Expr.Binary expr)
-    {
-        return Parenthesize(expr.Operator.Lexeme, expr.Left, expr.Right);
-    }
+    public string VisitBinaryExpr(Expr.Binary expr) => Parenthesize(expr.Operator.Lexeme, expr.Left, expr.Right);
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="expr"></param>
     /// <returns></returns>
-    public string VisitGroupingExpr(Expr.Grouping expr)
-    {
-        return Parenthesize("group", expr.Expression);
-    }
+    public string VisitGroupingExpr(Expr.Grouping expr) => Parenthesize("group", expr.Expression);
 
     /// <summary>
     /// 
@@ -56,10 +47,14 @@ public class AstPrinter : Expr.IVisitor<string>
     /// </summary>
     /// <param name="expr"></param>
     /// <returns></returns>
-    public string VisitUnaryExpr(Expr.Unary expr)
-    {
-        return Parenthesize(expr.Operator.Lexeme, expr.Right);
-    }
+    public string VisitLogicalExpr(Expr.Logical expr) => Parenthesize(expr.Operator.Lexeme, expr.Left, expr.Right);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="expr"></param>
+    /// <returns></returns>
+    public string VisitUnaryExpr(Expr.Unary expr) => Parenthesize(expr.Operator.Lexeme, expr.Right);
 
     /// <summary>
     /// 

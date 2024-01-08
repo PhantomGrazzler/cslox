@@ -38,4 +38,18 @@ public class AstPrinterTests
 
         Assert.Equal("var var_name", m_astPrinter.Print(expression));
     }
+
+    [Fact]
+    public void LogicalExpressions()
+    {
+        var expression = new Expr.Logical(
+            new Expr.Literal(8),
+            new Token(TokenType.Or, "or", new(), 1),
+            new Expr.Logical(
+                new Expr.Literal("hi"),
+                new Token(TokenType.And, "and", new(), 1),
+                new Expr.Literal(9)));
+
+        Assert.Equal("(or 8 (and hi 9))", m_astPrinter.Print(expression));
+    }
 }

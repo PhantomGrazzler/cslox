@@ -133,6 +133,33 @@ public class Interpreter : Expr.IVisitor<object?>
     /// <summary>
     /// 
     /// </summary>
+    /// <param name="expr"></param>
+    /// <returns></returns>
+    public object? VisitLogicalExpr(Expr.Logical expr)
+    {
+        var left = Evaluate(expr.Left);
+
+        if (expr.Operator.Type == TokenType.Or)
+        {
+            if (IsTruthy(left))
+            {
+                return left;
+            }
+        }
+        else
+        {
+            if (!IsTruthy(left))
+            {
+                return left;
+            }
+        }
+
+        return Evaluate(expr.Right);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
     /// <param name="expr">Unary expression.</param>
     /// <returns></returns>
     public object? VisitUnaryExpr(Expr.Unary expr)

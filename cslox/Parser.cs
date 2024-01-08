@@ -123,7 +123,7 @@ public class Parser
 
     private Expr Assignment()
     {
-        var expr = Equality();
+        var expr = Or();
 
         if (Match(TokenType.Equal))
         {
@@ -137,6 +137,34 @@ public class Parser
             }
 
             _ = Error(token: equals, $"Invalid assignment target: {equals.Lexeme}.");
+        }
+
+        return expr;
+    }
+
+    private Expr Or()
+    {
+        var expr = And();
+
+        while (Match(TokenType.Or))
+        {
+            var op = Previous();
+            var right = And();
+            expr = new Expr.Logical(expr, op, right);
+        }
+
+        return expr;
+    }
+
+    private Expr And()
+    {
+        var expr = Equality();
+
+        while (Match(TokenType.And))
+        {
+            var op = Previous();
+            var right = Equality();
+            expr = new Expr.Logical(expr, op, right);
         }
 
         return expr;
