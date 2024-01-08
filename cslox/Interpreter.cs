@@ -233,6 +233,25 @@ public class Interpreter : Expr.IVisitor<object?>
     /// </summary>
     /// <param name="stmt"></param>
     /// <returns><c>null</c></returns>
+    public object? VisitIfStmt(Stmt.If stmt)
+    {
+        if (IsTruthy(stmt.Condition))
+        {
+            Execute(stmt.ThenBranch);
+        }
+        else if (stmt.ElseBranch != null)
+        {
+            Execute(stmt.ElseBranch);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="stmt"></param>
+    /// <returns><c>null</c></returns>
     public object? VisitPrintStmt(Stmt.Print stmt)
     {
         var value = Evaluate(stmt.Expression);

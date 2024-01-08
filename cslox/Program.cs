@@ -2,7 +2,7 @@
 
 internal class Program
 {
-    private const string CompletedSection = "8.5";
+    private const string CompletedSection = "9.2";
 
     private static void Main(string[] args)
     {
@@ -16,6 +16,7 @@ internal class Program
         }
         else if (args.Length == 1)
         {
+            Console.WriteLine($"Executing file: {args[0]}");
             Lox.RunFile(args[0]);
         }
         else
