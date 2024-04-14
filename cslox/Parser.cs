@@ -66,6 +66,7 @@ public class Parser
     {
         if (Match(TokenType.If)) return IfStatement();
         if (Match(TokenType.Print)) return PrintStatement();
+        if (Match(TokenType.While)) return WhileStatement();
         if (Match(TokenType.LeftBrace)) return new Stmt.Block(Block());
 
         return ExpressionStatement();
@@ -75,7 +76,7 @@ public class Parser
     {
         _ = Consume(TokenType.LeftParen, "Expected '(' after 'if'.");
         var condition = Expression();
-        _ = Consume(TokenType.RightParen, "Expected ')' after if condition.");
+        _ = Consume(TokenType.RightParen, "Expected ')' after 'if' condition.");
 
         var thenBranch = Statement();
         var elseBranch = Match(TokenType.Else) ? Statement() : null;
@@ -87,7 +88,18 @@ public class Parser
     {
         var value = Expression();
         _ = Consume(TokenType.Semicolon, "Expected ';' after value.");
+
         return new Stmt.Print(value);
+    }
+
+    private Stmt WhileStatement()
+    {
+        _ = Consume(TokenType.LeftParen, "Expected '(' after 'while'.");
+        var condition = Expression();
+        _ = Consume(TokenType.RightParen, "Expected ')' after 'while' condition.");
+        var body = Statement();
+
+        return new Stmt.While(condition, body);
     }
 
     private Stmt VarDeclaration()

@@ -289,6 +289,21 @@ public class Interpreter : Expr.IVisitor<object?>
     /// <summary>
     /// 
     /// </summary>
+    /// <param name="stmt">'while' statement to execute.</param>
+    /// <returns><c>null</c></returns>
+    public object? VisitWhileStmt(Stmt.While stmt)
+    {
+        while (IsTruthy(Evaluate(stmt.Condition)))
+        {
+            Execute(stmt.Body);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
     /// <param name="stmt"></param>
     /// <returns><c>null</c></returns>
     public object? VisitVarStmt(Stmt.Var stmt)
