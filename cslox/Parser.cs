@@ -64,12 +64,50 @@ public class Parser
 
     private Stmt Statement()
     {
+        if (Match(TokenType.For)) return ForStatement();
         if (Match(TokenType.If)) return IfStatement();
         if (Match(TokenType.Print)) return PrintStatement();
         if (Match(TokenType.While)) return WhileStatement();
         if (Match(TokenType.LeftBrace)) return new Stmt.Block(Block());
 
         return ExpressionStatement();
+    }
+
+    private Stmt ForStatement()
+    {
+        _ = Consume(TokenType.LeftParen, "Expected '(' after 'for'.");
+
+        Stmt? GetInitializer()
+        {
+            if (Match(TokenType.Semicolon)) return null;
+            else if (Match(TokenType.Var)) return VarDeclaration();
+            else return ExpressionStatement();
+        }
+        var initializer = GetInitializer();
+
+        var condition = Check(TokenType.Semicolon) ? new Expr.Literal(true) : Expression();
+        _ = Consume(TokenType.Semicolon, "Expected ';' after 'for' loop condition.");
+
+        var increment = Check(TokenType.RightParen) ? null : Expression();
+        _ = Consume(TokenType.RightParen, "Expected ')' after 'for' loop increment.");
+
+        var body = Statement();
+
+        if (increment != null)
+        {
+            // TODO: Use collection initializer after upgrading to C#12.
+            body = new Stmt.Block(new() { body, new Stmt.ExpressionStatement(increment) });
+        }
+
+        body = new Stmt.While(condition, body);
+
+        if (initializer != null)
+        {
+            // TODO: Use collection initializer after upgrading to C#12.
+            body = new Stmt.Block(new() { initializer, body });
+        }
+
+        return body;
     }
 
     private Stmt IfStatement()
@@ -308,7 +346,7 @@ public class Parser
         {
             if (Check(type))
             {
-                Advance();
+                _ = Advance();
                 return true;
             }
         }
