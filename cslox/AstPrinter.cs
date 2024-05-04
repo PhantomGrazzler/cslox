@@ -33,6 +33,14 @@ public class AstPrinter : Expr.IVisitor<string>
     /// </summary>
     /// <param name="expr"></param>
     /// <returns></returns>
+    public string VisitCallExpr(Expr.Call expr) =>
+        $"call {expr.Callee.Accept(this)} {Parenthesize(name: "arguments:", expr.Arguments.ToArray())}";
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="expr"></param>
+    /// <returns></returns>
     public string VisitGroupingExpr(Expr.Grouping expr) => Parenthesize("group", expr.Expression);
 
     /// <summary>
@@ -61,7 +69,7 @@ public class AstPrinter : Expr.IVisitor<string>
     /// </summary>
     /// <param name="expr"></param>
     /// <returns></returns>
-    public string VisitVariableExpr(Expr.Variable expr) => $"var {expr.Name.Lexeme}";
+    public string VisitVariableExpr(Expr.Variable expr) => $"{expr.Name.Lexeme}";
 
     private string Parenthesize(string name, params Expr[] exprs)
     {

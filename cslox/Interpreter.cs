@@ -23,13 +23,42 @@ public sealed class RuntimeError : Exception
     }
 }
 
+internal class ClockCallable : ILoxCallable
+{
+    public int Arity() => 0;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="interpreter">Unused</param>
+    /// <param name="arguments">Unused</param>
+    /// <returns>Ticks in seconds.</returns>
+    public object Call(Interpreter interpreter, IEnumerable<object?> arguments)
+    {
+        return DateTime.UtcNow.Ticks / 10_000_000.0;
+    }
+
+    public override string ToString() => "<native fn>";
+}
+
 /// <summary>
 /// 
 /// </summary>
 public class Interpreter : Expr.IVisitor<object?>
                          , Stmt.IVisitor<object?>
 {
-    private LoxEnvironment m_environment = new();
+    private readonly LoxEnvironment m_globals = new();
+    private LoxEnvironment m_environment;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public Interpreter()
+    {
+        m_environment = m_globals;
+
+        m_globals.Define("clock", new ClockCallable());
+    }
 
     /// <summary>
     /// 
@@ -108,6 +137,32 @@ public class Interpreter : Expr.IVisitor<object?>
 
         // Unreachable
         return null;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="expr">Call expression.</param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException">If the callee evaluates to <c>null</c>.</exception>
+    public object? VisitCallExpr(Expr.Call expr)
+    {
+        var callee = Evaluate(expr.Callee);
+        if (callee is not ILoxCallable)
+        {
+            throw new RuntimeError(token: expr.ClosingParen, "Can only call functions and classes.");
+        }
+
+        var arguments = expr.Arguments.Select(arg => Evaluate(arg));
+        var function = (ILoxCallable)callee;
+
+        if (arguments.Count() != function.Arity())
+        {
+            throw new RuntimeError(
+                token: expr.ClosingParen, $"Expected {function.Arity()} arguments but got {arguments.Count()}.");
+        }
+
+        return function?.Call(this, arguments);
     }
 
     /// <summary>

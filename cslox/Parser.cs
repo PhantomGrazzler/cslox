@@ -17,6 +17,7 @@ public class ParseError : Exception
 /// </summary>
 public class Parser
 {
+    private const int MaxArguments = 255;
     private readonly List<Token> m_tokens = new();
     private int m_currentIndex = 0;
 
@@ -281,7 +282,48 @@ public class Parser
             return new Expr.Unary(op, right);
         }
 
-        return Primary();
+        return Call();
+    }
+
+    private Expr Call()
+    {
+        var expr = Primary();
+
+        while (true)
+        {
+            if (Match(TokenType.LeftParen))
+            {
+                expr = FinishCall(expr);
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        return expr;
+    }
+
+    private Expr FinishCall(Expr callee)
+    {
+        var arguments = new List<Expr>();
+
+        if (!Check(TokenType.RightParen))
+        {
+            do
+            {
+                if (arguments.Count >= MaxArguments)
+                {
+                    _ = Error(token: Peek(), message: $"Cannot have more than {MaxArguments} arguments.");
+                }
+
+                arguments.Add(Expression());
+            } while (Match(TokenType.Comma));
+        }
+
+        var closingParen = Consume(TokenType.RightParen, "Expected ')' after arguments.");
+
+        return new Expr.Call(callee, closingParen, arguments);
     }
 
     private Expr Primary()

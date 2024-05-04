@@ -36,7 +36,7 @@ public class AstPrinterTests
     {
         var expression = new Expr.Variable(new Token(TokenType.Identifier, "var_name", new(), 1));
 
-        Assert.Equal("var var_name", m_astPrinter.Print(expression));
+        Assert.Equal("var_name", m_astPrinter.Print(expression));
     }
 
     [Fact]
@@ -51,5 +51,20 @@ public class AstPrinterTests
                 new Expr.Literal(9)));
 
         Assert.Equal("(or 8 (and hi 9))", m_astPrinter.Print(expression));
+    }
+
+    [Fact]
+    public void CallExpression()
+    {
+        var expression = new Expr.Call(
+            Callee: new Expr.Literal("function"),
+            ClosingParen: new Token(TokenType.RightParen, ")", new(), 1),
+            Arguments: new()
+            {
+                new Expr.Literal(65),
+                new Expr.Variable(new Token(TokenType.Identifier, "variable", new(), 1))
+            });
+
+        Assert.Equal("call function (arguments: 65 variable)", m_astPrinter.Print(expression));
     }
 }
