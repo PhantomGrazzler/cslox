@@ -1,6 +1,9 @@
 ﻿namespace cslox;
 
-internal class LoxEnvironment
+/// <summary>
+/// 
+/// </summary>
+public class LoxEnvironment
 {
     private readonly LoxEnvironment? m_enclosing;
     private readonly Dictionary<string, object?> m_environment = new();

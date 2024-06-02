@@ -47,17 +47,21 @@ internal class ClockCallable : ILoxCallable
 public class Interpreter : Expr.IVisitor<object?>
                          , Stmt.IVisitor<object?>
 {
-    private readonly LoxEnvironment m_globals = new();
     private LoxEnvironment m_environment;
+
+    /// <summary>
+    /// Global environment.
+    /// </summary>
+    public readonly LoxEnvironment Globals = new();
 
     /// <summary>
     /// 
     /// </summary>
     public Interpreter()
     {
-        m_environment = m_globals;
+        m_environment = Globals;
 
-        m_globals.Define("clock", new ClockCallable());
+        Globals.Define("clock", new ClockCallable());
     }
 
     /// <summary>
@@ -315,6 +319,18 @@ public class Interpreter : Expr.IVisitor<object?>
     /// </summary>
     /// <param name="stmt"></param>
     /// <returns><c>null</c></returns>
+    public object? VisitFunctionStmt(Stmt.Function stmt)
+    {
+        var function = new LoxFunction(stmt);
+        m_environment.Define(stmt.Name.Lexeme, function);
+        return null;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="stmt"></param>
+    /// <returns><c>null</c></returns>
     public object? VisitIfStmt(Stmt.If stmt)
     {
         if (IsTruthy(stmt.Condition))
@@ -391,7 +407,7 @@ public class Interpreter : Expr.IVisitor<object?>
         return null;
     }
 
-    private void ExecuteBlock(List<Stmt?> statements, LoxEnvironment environment)
+    internal void ExecuteBlock(List<Stmt?> statements, LoxEnvironment environment)
     {
         var previousEnvironment = m_environment;
 

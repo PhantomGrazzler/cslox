@@ -23,15 +23,17 @@ DefineAst(outputDirectory, "Stmt", new List<string>
 {
     "Block                  : List<Stmt?> Statements",
     "ExpressionStatement    : Expr Expression",
+    "Function               : Token Name, List<Token> Params, List<Stmt?> Body",
     "If                     : Expr Condition, Stmt ThenBranch, Stmt? ElseBranch",
     "Print                  : Expr Expression",
     "While                  : Expr Condition, Stmt Body",
     "Var                    : Token Name, Expr? Initializer",
 });
 
+const string Indent = "    ";
+
 static void DefineAst(string outputDirectory, string baseName, List<string> types)
 {
-    const string indent = "    ";
     var path = Path.Combine(outputDirectory, $"{baseName}.cs");
     Console.WriteLine($"> Generating {Path.GetFullPath(path)}");
     using var writer = File.CreateText(path);
@@ -46,7 +48,7 @@ static void DefineAst(string outputDirectory, string baseName, List<string> type
 
     DefineVisitor(writer, baseName, types);
 
-    writer.WriteLine($"{indent}public abstract R Accept<R>(IVisitor<R> visitor);");
+    writer.WriteLine($"{Indent}public abstract R Accept<R>(IVisitor<R> visitor);");
     writer.WriteLine();
 
     foreach (var type in types)
@@ -70,26 +72,24 @@ static void DefineAst(string outputDirectory, string baseName, List<string> type
 
 static void DefineType(StreamWriter writer, string baseName, string className, string fieldList)
 {
-    const string indent = "    ";
-    writer.WriteLine($"{indent}public record {className}({fieldList}) : {baseName}");
-    writer.WriteLine($"{indent}{{");
-    writer.WriteLine($"{indent}{indent}public override R Accept<R>(IVisitor<R> visitor)");
-    writer.WriteLine($"{indent}{indent}{{");
-    writer.WriteLine($"{indent}{indent}{indent}return visitor.Visit{className}{baseName}(this);");
-    writer.WriteLine($"{indent}{indent}}}");
-    writer.WriteLine($"{indent}}}");
+    writer.WriteLine($"{Indent}public record {className}({fieldList}) : {baseName}");
+    writer.WriteLine($"{Indent}{{");
+    writer.WriteLine($"{Indent}{Indent}public override R Accept<R>(IVisitor<R> visitor)");
+    writer.WriteLine($"{Indent}{Indent}{{");
+    writer.WriteLine($"{Indent}{Indent}{Indent}return visitor.Visit{className}{baseName}(this);");
+    writer.WriteLine($"{Indent}{Indent}}}");
+    writer.WriteLine($"{Indent}}}");
 }
 
 static void DefineVisitor(StreamWriter writer, string baseName, List<string> types)
 {
-    const string indent = "    ";
-    writer.WriteLine($"{indent}public interface IVisitor<R>");
-    writer.WriteLine($"{indent}{{");
+    writer.WriteLine($"{Indent}public interface IVisitor<R>");
+    writer.WriteLine($"{Indent}{{");
     foreach (var type in types)
     {
         var typeName = type.Split(':', StringSplitOptions.TrimEntries)[0];
-        writer.WriteLine($"{indent}{indent}R Visit{typeName}{baseName}({typeName} {baseName.ToLower()});");
+        writer.WriteLine($"{Indent}{Indent}R Visit{typeName}{baseName}({typeName} {baseName.ToLower()});");
     }
-    writer.WriteLine($"{indent}}}");
+    writer.WriteLine($"{Indent}}}");
     writer.WriteLine();
 }

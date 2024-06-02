@@ -17,6 +17,11 @@ public class ParseError : Exception
 /// </summary>
 public class Parser
 {
+    private enum Kind
+    {
+        Function,
+    }
+
     private const int MaxArguments = 255;
     private readonly List<Token> m_tokens = new();
     private int m_currentIndex = 0;
@@ -49,10 +54,8 @@ public class Parser
     {
         try
         {
-            if (Match(TokenType.Var))
-            {
-                return VarDeclaration();
-            }
+            if (Match(TokenType.Fun)) return Function(Kind.Function);
+            if (Match(TokenType.Var)) return VarDeclaration();
 
             return Statement();
         }
@@ -155,6 +158,31 @@ public class Parser
         var expr = Expression();
         _ = Consume(TokenType.Semicolon, "Expected ';' after expression.");
         return new Stmt.ExpressionStatement(expr);
+    }
+
+    private Stmt.Function Function(Kind kind)
+    {
+        var name = Consume(TokenType.Identifier, $"Expected {kind} name.");
+        _ = Consume(TokenType.LeftParen, $"Expected '(' after {kind} name.");
+        var parameters = new List<Token>();
+
+        if (!Check(TokenType.RightParen))
+        {
+            do
+            {
+                if (parameters.Count >= MaxArguments)
+                {
+                    _ = Error(Peek(), "Cannot have more than 255 parameters.");
+                }
+                parameters.Add(Consume(TokenType.Identifier, "Expected parameter name."));
+            } while (Match(TokenType.Comma));
+        }
+
+        _ = Consume(TokenType.RightParen, "Expected ')' after parameters.");
+        _ = Consume(TokenType.LeftBrace, $"Expected '{{' before {kind} body.");
+        var body = Block();
+
+        return new Stmt.Function(name, parameters, body);
     }
 
     private List<Stmt?> Block()
