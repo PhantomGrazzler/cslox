@@ -71,6 +71,7 @@ public class Parser
         if (Match(TokenType.For)) return ForStatement();
         if (Match(TokenType.If)) return IfStatement();
         if (Match(TokenType.Print)) return PrintStatement();
+        if (Match(TokenType.Return)) return ReturnStatement();
         if (Match(TokenType.While)) return WhileStatement();
         if (Match(TokenType.LeftBrace)) return new Stmt.Block(Block());
 
@@ -132,6 +133,19 @@ public class Parser
         _ = Consume(TokenType.Semicolon, "Expected ';' after value.");
 
         return new Stmt.Print(value);
+    }
+
+    private Stmt ReturnStatement()
+    {
+        var keyword = Previous();
+        Expr? value = null;
+        if (!Check(TokenType.Semicolon))
+        {
+            value = Expression();
+        }
+
+        _ = Consume(TokenType.Semicolon, "Expected ';' after return value.");
+        return new Stmt.Return(keyword, value);
     }
 
     private Stmt WhileStatement()

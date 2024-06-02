@@ -26,6 +26,7 @@ DefineAst(outputDirectory, "Stmt", new List<string>
     "Function               : Token Name, List<Token> Params, List<Stmt?> Body",
     "If                     : Expr Condition, Stmt ThenBranch, Stmt? ElseBranch",
     "Print                  : Expr Expression",
+    "Return                 : Token Keyword, Expr? Value",
     "While                  : Expr Condition, Stmt Body",
     "Var                    : Token Name, Expr? Initializer",
 });

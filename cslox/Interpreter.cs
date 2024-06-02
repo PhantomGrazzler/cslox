@@ -333,7 +333,7 @@ public class Interpreter : Expr.IVisitor<object?>
     /// <returns><c>null</c></returns>
     public object? VisitIfStmt(Stmt.If stmt)
     {
-        if (IsTruthy(stmt.Condition))
+        if (IsTruthy(Evaluate(stmt.Condition)))
         {
             Execute(stmt.ThenBranch);
         }
@@ -355,6 +355,17 @@ public class Interpreter : Expr.IVisitor<object?>
         var value = Evaluate(stmt.Expression);
         Console.WriteLine(Stringify(value));
         return null;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="stmt"></param>
+    /// <returns></returns>
+    public object? VisitReturnStmt(Stmt.Return stmt)
+    {
+        var value = stmt.Value == null ? null : Evaluate(stmt.Value);
+        throw new Return(value);
     }
 
     /// <summary>

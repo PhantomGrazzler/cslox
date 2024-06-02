@@ -20,7 +20,15 @@ internal class LoxFunction : ILoxCallable
             environment.Define(name: parameter.Lexeme, value: argument);
         }
 
-        interpreter.ExecuteBlock(m_declaration.Body, environment);
+        try
+        {
+            interpreter.ExecuteBlock(m_declaration.Body, environment);
+        }
+        catch (Return returnValue)
+        {
+            return returnValue.Value;
+        }
+
         return null;
     }
 
