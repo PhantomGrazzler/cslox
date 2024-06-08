@@ -3,17 +3,19 @@
 internal class LoxFunction : ILoxCallable
 {
     private readonly Stmt.Function m_declaration;
+    private readonly LoxEnvironment m_closure;
 
-    internal LoxFunction(Stmt.Function declaration)
+    internal LoxFunction(Stmt.Function declaration, LoxEnvironment closure)
     {
         m_declaration = declaration;
+        m_closure = closure;
     }
 
     public int Arity() => m_declaration.Params.Count;
 
     public object? Call(Interpreter interpreter, IEnumerable<object?> arguments)
     {
-        var environment = new LoxEnvironment(interpreter.Globals);
+        var environment = new LoxEnvironment(m_closure);
 
         foreach (var (argument, parameter) in arguments.Zip(m_declaration.Params))
         {

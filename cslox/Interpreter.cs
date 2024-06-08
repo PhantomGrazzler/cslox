@@ -321,7 +321,7 @@ public class Interpreter : Expr.IVisitor<object?>
     /// <returns><c>null</c></returns>
     public object? VisitFunctionStmt(Stmt.Function stmt)
     {
-        var function = new LoxFunction(stmt);
+        var function = new LoxFunction(stmt, m_environment);
         m_environment.Define(stmt.Name.Lexeme, function);
         return null;
     }
