@@ -379,7 +379,7 @@ public class Parser
         if (Match(TokenType.LeftParen))
         {
             var expr = Expression();
-            Consume(TokenType.RightParen, "Expected ')' after expression.");
+            _ = Consume(TokenType.RightParen, "Expected ')' after expression.");
             return new Expr.Grouping(expr);
         }
 

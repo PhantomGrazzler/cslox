@@ -13,8 +13,8 @@ public class ScannerTests
     {
         var tokens = ScanTokens(string.Empty);
 
-        Assert.Single(tokens);
-        Assert.Equal(TokenType.Eof, tokens.First().Type);
+        var firstToken = Assert.Single(tokens);
+        Assert.Equal(TokenType.Eof, firstToken.Type);
     }
 
     [Theory]
@@ -72,8 +72,8 @@ public class ScannerTests
     {
         var tokens = ScanTokens("\"unterminated string");
 
-        Assert.Single(tokens);
-        Assert.Equal(TokenType.Eof, tokens.First().Type);
+        var firstToken = Assert.Single(tokens);
+        Assert.Equal(TokenType.Eof, firstToken.Type);
     }
 
     [Theory]
@@ -142,8 +142,8 @@ public class ScannerTests
     {
         var tokens = ScanTokens(invalidCharacter);
 
-        Assert.Single(tokens);
-        Assert.Equal(TokenType.Eof, tokens.First().Type);
+        var firstToken = Assert.Single(tokens);
+        Assert.Equal(TokenType.Eof, firstToken.Type);
     }
 
     [Fact]
@@ -155,8 +155,8 @@ public class ScannerTests
 
         var tokens = ScanTokens(input);
 
-        Assert.Single(tokens);
-        Assert.Equal(TokenType.Eof, tokens.First().Type);
+        var firstToken = Assert.Single(tokens);
+        Assert.Equal(TokenType.Eof, firstToken.Type);
     }
 
     [Fact]
