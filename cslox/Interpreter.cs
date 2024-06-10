@@ -48,6 +48,7 @@ public class Interpreter : Expr.IVisitor<object?>
                          , Stmt.IVisitor<object?>
 {
     private LoxEnvironment m_environment;
+    private readonly Dictionary<Expr, int> m_locals = new();
 
     /// <summary>
     /// Global environment.
@@ -86,6 +87,16 @@ public class Interpreter : Expr.IVisitor<object?>
     private void Execute(Stmt? statement)
     {
         _ = statement?.Accept(this);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="expr"></param>
+    /// <param name="depth"></param>
+    public void Resolve(Expr expr, int depth)
+    {
+        m_locals.Add(expr, depth);
     }
 
     /// <summary>
@@ -246,7 +257,19 @@ public class Interpreter : Expr.IVisitor<object?>
     /// <returns></returns>
     public object? VisitVariableExpr(Expr.Variable expr)
     {
-        return m_environment.Get(expr.Name);
+        return LookUpVariable(expr.Name, expr);
+    }
+
+    private object? LookUpVariable(Token name, Expr expr)
+    {
+        if (m_locals.TryGetValue(expr, out var distance))
+        {
+            return m_environment.GetAt(distance, name);
+        }
+        else
+        {
+            return Globals.Get(name);
+        }
     }
 
     private object? Evaluate(Expr expr)
@@ -403,7 +426,16 @@ public class Interpreter : Expr.IVisitor<object?>
     public object? VisitAssignExpr(Expr.Assign expr)
     {
         var value = Evaluate(expr.Value);
-        m_environment.Assign(expr.Name, value);
+
+        if (m_locals.TryGetValue(expr, out var distance))
+        {
+            m_environment.AssignAt(distance, expr.Name, value);
+        }
+        else
+        {
+            Globals.Assign(expr.Name, value);
+        }
+
         return value;
     }
 

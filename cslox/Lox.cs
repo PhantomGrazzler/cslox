@@ -36,6 +36,9 @@ internal sealed class Lox
 
         if (HadError) return;
 
+        var resolver = new Resolver(Interpreter);
+        resolver.Resolve(statements);
+
         Interpreter.Interpret(statements);
     }
 

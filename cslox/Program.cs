@@ -2,7 +2,7 @@
 
 internal class Program
 {
-    private const string CompletedSection = "10.6";
+    private const string CompletedSection = "11.4";
 
     private static void Main(string[] args)
     {
