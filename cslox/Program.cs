@@ -2,13 +2,13 @@
 
 internal class Program
 {
-    private const string CompletedSection = "11.4";
+    private const string CompletedSection = "11.5";
 
     private static void Main(string[] args)
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
-        Console.WriteLine(
-            $"PhantomGrazzler's C# Lox interpreter (completed up to section {CompletedSection}){Environment.NewLine}");
+        Console.WriteLine($"PhantomGrazzler's C# Lox interpreter (completed up to and including section " +
+            $"{CompletedSection}){Environment.NewLine}");
 
         if (args.Length > 1)
         {

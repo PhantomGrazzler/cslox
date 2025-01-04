@@ -39,6 +39,9 @@ internal sealed class Lox
         var resolver = new Resolver(Interpreter);
         resolver.Resolve(statements);
 
+        // Stop if there was a resolution error.
+        if (HadError) return;
+
         Interpreter.Interpret(statements);
     }
 

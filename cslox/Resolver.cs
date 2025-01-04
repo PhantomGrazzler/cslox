@@ -9,11 +9,18 @@ internal class Resolver : Expr.IVisitor<object?>
         Initialised,
     }
 
+    private enum FunctionType
+    {
+        None,
+        Function,
+    }
+
     private readonly Interpreter m_interpreter;
     /// <summary>
     /// Dictionary maps variable name (lexeme) to its initialisation status.
     /// </summary>
     private readonly Stack<Dictionary<string, Status>> m_scopes = new();
+    private FunctionType m_currentFunction = FunctionType.None;
 
     internal Resolver(Interpreter interpreter)
     {
@@ -74,12 +81,15 @@ internal class Resolver : Expr.IVisitor<object?>
     {
         Declare(stmt.Name);
         Define(stmt.Name);
-        ResolveFunction(stmt);
+        ResolveFunction(stmt, FunctionType.Function);
         return null;
     }
 
-    private void ResolveFunction(Stmt.Function function)
+    private void ResolveFunction(Stmt.Function function, FunctionType type)
     {
+        var enclosingFunction = m_currentFunction;
+        m_currentFunction = type;
+
         BeginScope();
         function.Params.ForEach(param =>
         {
@@ -88,6 +98,8 @@ internal class Resolver : Expr.IVisitor<object?>
         });
         Resolve(function.Body);
         EndScope();
+
+        m_currentFunction = enclosingFunction;
     }
 
     public object? VisitGroupingExpr(Expr.Grouping expr)
@@ -124,6 +136,11 @@ internal class Resolver : Expr.IVisitor<object?>
 
     public object? VisitReturnStmt(Stmt.Return stmt)
     {
+        if (m_currentFunction == FunctionType.None)
+        {
+            Lox.Error(stmt.Keyword, "Cannot return from top-level code.");
+        }
+
         if (stmt.Value != null)
         {
             Resolve(stmt.Value);
@@ -181,7 +198,12 @@ internal class Resolver : Expr.IVisitor<object?>
     {
         if (m_scopes.TryPeek(out var scope))
         {
-            scope.Add(name.Lexeme, Status.Uninitialised);
+            if (scope.ContainsKey(name.Lexeme))
+            {
+                Lox.Error(name, "Already a variable with this name in this scope.");
+            }
+
+            scope[name.Lexeme] = Status.Uninitialised;
         }
     }
 
