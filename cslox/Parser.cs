@@ -20,6 +20,7 @@ public class Parser
     private enum Kind
     {
         Function,
+        Method,
     }
 
     private const int MaxArguments = 255;
@@ -54,6 +55,7 @@ public class Parser
     {
         try
         {
+            if (Match(TokenType.Class)) return ClassDeclaration();
             if (Match(TokenType.Fun)) return Function(Kind.Function);
             if (Match(TokenType.Var)) return VarDeclaration();
 
@@ -64,6 +66,22 @@ public class Parser
             Synchronise();
             return null;
         }
+    }
+
+    private Stmt ClassDeclaration()
+    {
+        var name = Consume(TokenType.Identifier, "Expected class name.");
+        _ = Consume(TokenType.LeftBrace, "Expected '{' before class body.");
+
+        List<Stmt.Function> methods = [];
+        while (!Check(TokenType.RightBrace) && !IsAtEnd())
+        {
+            methods.Add(Function(Kind.Method));
+        }
+
+        _ = Consume(TokenType.RightBrace, "Expected '}' after class body.");
+
+        return new Stmt.Class(name, methods);
     }
 
     private Stmt Statement()

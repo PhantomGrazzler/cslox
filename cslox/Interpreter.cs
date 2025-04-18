@@ -450,6 +450,20 @@ public class Interpreter : Expr.IVisitor<object?>
         return null;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="stmt"></param>
+    /// <returns><c>null</c></returns>
+    public object? VisitClassStmt(Stmt.Class stmt)
+    {
+        m_environment.Define(stmt.Name.Lexeme, value: null);
+        var loxClass = new LoxClass(stmt.Name.Lexeme);
+        m_environment.Assign(stmt.Name, loxClass);
+
+        return null;
+    }
+
     internal void ExecuteBlock(List<Stmt?> statements, LoxEnvironment environment)
     {
         var previousEnvironment = m_environment;

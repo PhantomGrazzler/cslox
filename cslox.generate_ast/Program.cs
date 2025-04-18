@@ -1,14 +1,12 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-if (args.Length != 1)
+﻿if (args.Length != 1)
 {
     Console.WriteLine("Usage: generate_ast <output directory>\n");
     throw new ArgumentException("Invalid number of arguments provided", nameof(args));
 }
 
 var outputDirectory = args[0];
-DefineAst(outputDirectory, "Expr", new List<string>
-{
+DefineAst(outputDirectory, "Expr",
+[
     "Assign     : Token Name, Expr Value",
     "Binary     : Expr Left, Token Operator, Expr Right",
     "Call       : Expr Callee, Token ClosingParen, List<Expr> Arguments",
@@ -17,11 +15,12 @@ DefineAst(outputDirectory, "Expr", new List<string>
     "Logical    : Expr Left, Token Operator, Expr Right",
     "Unary      : Token Operator, Expr Right",
     "Variable   : Token Name",
-});
+]);
 
-DefineAst(outputDirectory, "Stmt", new List<string>
-{
+DefineAst(outputDirectory, "Stmt",
+[
     "Block                  : List<Stmt?> Statements",
+    "Class                  : Token Name, List<Stmt.Function> Methods",
     "ExpressionStatement    : Expr Expression",
     "Function               : Token Name, List<Token> Params, List<Stmt?> Body",
     "If                     : Expr Condition, Stmt ThenBranch, Stmt? ElseBranch",
@@ -29,7 +28,7 @@ DefineAst(outputDirectory, "Stmt", new List<string>
     "Return                 : Token Keyword, Expr? Value",
     "While                  : Expr Condition, Stmt Body",
     "Var                    : Token Name, Expr? Initializer",
-});
+]);
 
 const string Indent = "    ";
 

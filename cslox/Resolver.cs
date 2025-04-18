@@ -50,6 +50,13 @@ internal class Resolver : Expr.IVisitor<object?>
         return null;
     }
 
+    public object? VisitClassStmt(Stmt.Class stmt)
+    {
+        Declare(stmt.Name);
+        Define(stmt.Name);
+        return null;
+    }
+
     private void BeginScope() => m_scopes.Push(new());
     private void EndScope() => m_scopes.Pop();
 
