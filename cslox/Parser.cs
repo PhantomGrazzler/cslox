@@ -243,8 +243,11 @@ public class Parser
 
             if (expr is Expr.Variable variable)
             {
-                var name = variable.Name;
-                return new Expr.Assign(name, value);
+                return new Expr.Assign(variable.Name, value);
+            }
+            else if (expr is Expr.Get get)
+            {
+                return new Expr.Set(Object: get.Object, Name: get.Name, Value: value);
             }
 
             _ = Error(token: equals, $"Invalid assignment target: {equals.Lexeme}.");
@@ -354,6 +357,11 @@ public class Parser
             if (Match(TokenType.LeftParen))
             {
                 expr = FinishCall(expr);
+            }
+            else if (Match(TokenType.Dot))
+            {
+                var name = Consume(TokenType.Identifier, "Expected property name after '.'.");
+                expr = new Expr.Get(expr, name);
             }
             else
             {

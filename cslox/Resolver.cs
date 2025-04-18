@@ -78,6 +78,12 @@ internal class Resolver : Expr.IVisitor<object?>
         return null;
     }
 
+    public object? VisitGetExpr(Expr.Get expr)
+    {
+        Resolve(expr.Object);
+        return null;
+    }
+
     public object? VisitExpressionStatementStmt(Stmt.ExpressionStatement stmt)
     {
         Resolve(stmt.Expression);
@@ -132,6 +138,13 @@ internal class Resolver : Expr.IVisitor<object?>
     {
         Resolve(expr.Left);
         Resolve(expr.Right);
+        return null;
+    }
+
+    public object? VisitSetExpr(Expr.Set expr)
+    {
+        Resolve(expr.Value);
+        Resolve(expr.Object);
         return null;
     }
 

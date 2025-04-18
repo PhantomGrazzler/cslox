@@ -183,6 +183,23 @@ public class Interpreter : Expr.IVisitor<object?>
     /// <summary>
     /// 
     /// </summary>
+    /// <param name="expr">Get expression.</param>
+    /// <returns></returns>
+    /// <exception cref="RuntimeError">If the expression does not evaluate to a class instance.</exception>
+    public object? VisitGetExpr(Expr.Get expr)
+    {
+        var obj = Evaluate(expr.Object);
+        if (obj is LoxInstance instance)
+        {
+            return instance.Get(expr.Name);
+        }
+
+        throw new RuntimeError(token: expr.Name, "Only instances have properties.");
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
     /// <param name="expr">Grouping expression.</param>
     /// <returns></returns>
     public object? VisitGroupingExpr(Expr.Grouping expr)
@@ -225,6 +242,25 @@ public class Interpreter : Expr.IVisitor<object?>
         }
 
         return Evaluate(expr.Right);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="expr"></param>
+    /// <returns></returns>
+    public object? VisitSetExpr(Expr.Set expr)
+    {
+        var obj = Evaluate(expr.Object);
+
+        if (obj is not LoxInstance instance)
+        {
+            throw new RuntimeError(token: expr.Name, "Only instances have fields.");
+        }
+
+        var value = Evaluate(expr.Value);
+        instance.Set(expr.Name, value);
+        return value;
     }
 
     /// <summary>

@@ -34,7 +34,14 @@ public class AstPrinter : Expr.IVisitor<string>
     /// <param name="expr"></param>
     /// <returns></returns>
     public string VisitCallExpr(Expr.Call expr) =>
-        $"call {expr.Callee.Accept(this)} {Parenthesize(name: "arguments:", expr.Arguments.ToArray())}";
+        $"call {expr.Callee.Accept(this)} {Parenthesize(name: "arguments:", [.. expr.Arguments])}";
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="expr"></param>
+    /// <returns></returns>
+    public string VisitGetExpr(Expr.Get expr) => $"{expr.Object.Accept(this)}.{expr.Name.Lexeme}";
 
     /// <summary>
     /// 
@@ -56,6 +63,14 @@ public class AstPrinter : Expr.IVisitor<string>
     /// <param name="expr"></param>
     /// <returns></returns>
     public string VisitLogicalExpr(Expr.Logical expr) => Parenthesize(expr.Operator.Lexeme, expr.Left, expr.Right);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="expr"></param>
+    /// <returns></returns>
+    public string VisitSetExpr(Expr.Set expr) =>
+        Parenthesize(name: "=", new Expr.Get(expr.Object, expr.Name), expr.Value);
 
     /// <summary>
     /// 

@@ -59,12 +59,38 @@ public class AstPrinterTests
         var expression = new Expr.Call(
             Callee: new Expr.Literal("function"),
             ClosingParen: new Token(TokenType.RightParen, ")", new(), 1),
-            Arguments: new()
-            {
+            Arguments:
+            [
                 new Expr.Literal(65),
                 new Expr.Variable(new Token(TokenType.Identifier, "variable", new(), 1))
-            });
+            ]);
 
         Assert.Equal("call function (arguments: 65 variable)", m_astPrinter.Print(expression));
+    }
+
+    [Fact]
+    public void GetExpression()
+    {
+        var expression = new Expr.Get(
+            Object: new Expr.Get(
+                Object: new Expr.Literal("outer_object"),
+                Name: new Token(Type: TokenType.Identifier, Lexeme: "inner_object", Literal: new(), Line: 1)),
+            Name: new Token(Type: TokenType.Identifier, Lexeme: "my_field", Literal: new(), Line: 1));
+
+        Assert.Equal("outer_object.inner_object.my_field", m_astPrinter.Print(expression));
+    }
+
+    [Fact]
+    public void SetExpression()
+    {
+        var expression = new Expr.Set(
+            Object: new Expr.Literal("my_object"),
+            Name: new Token(Type: TokenType.Identifier, Lexeme: "my_field", Literal: new(), Line: 1),
+            Value: new Expr.Binary(
+                Left: new Expr.Literal(1),
+                Operator: new Token(Type: TokenType.Plus, Lexeme: "+", Literal: new(), Line: 1),
+                Right: new Expr.Literal(2)));
+
+        Assert.Equal("(= my_object.my_field (+ 1 2))", m_astPrinter.Print(expression));
     }
 }
