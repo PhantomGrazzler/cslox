@@ -494,7 +494,14 @@ public class Interpreter : Expr.IVisitor<object?>
     public object? VisitClassStmt(Stmt.Class stmt)
     {
         m_environment.Define(stmt.Name.Lexeme, value: null);
-        var loxClass = new LoxClass(stmt.Name.Lexeme);
+
+        var methods = new Dictionary<string, LoxFunction>();
+        foreach (var method in stmt.Methods)
+        {
+            methods[method.Name.Lexeme] = new LoxFunction(declaration: method, closure: m_environment);
+        }
+
+        var loxClass = new LoxClass(name: stmt.Name.Lexeme, methods: methods);
         m_environment.Assign(stmt.Name, loxClass);
 
         return null;

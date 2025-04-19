@@ -13,6 +13,7 @@ internal class Resolver : Expr.IVisitor<object?>
     {
         None,
         Function,
+        Method,
     }
 
     private readonly Interpreter m_interpreter;
@@ -54,6 +55,13 @@ internal class Resolver : Expr.IVisitor<object?>
     {
         Declare(stmt.Name);
         Define(stmt.Name);
+
+        foreach (var method in stmt.Methods)
+        {
+            var declaration = FunctionType.Method;
+            ResolveFunction(method, declaration);
+        }
+
         return null;
     }
 
