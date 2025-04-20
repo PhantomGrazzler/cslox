@@ -5,7 +5,7 @@ namespace cslox;
 /// <summary>
 /// 
 /// </summary>
-public class AstPrinter : Expr.IVisitor<string>
+public sealed class AstPrinter : Expr.IVisitor<string>
 {
     /// <summary>
     /// 
@@ -71,6 +71,13 @@ public class AstPrinter : Expr.IVisitor<string>
     /// <returns></returns>
     public string VisitSetExpr(Expr.Set expr) =>
         Parenthesize(name: "=", new Expr.Get(expr.Object, expr.Name), expr.Value);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="expr"></param>
+    /// <returns></returns>
+    public string VisitThisExpr(Expr.This expr) => $"{expr.Keyword.Lexeme}";
 
     /// <summary>
     /// 

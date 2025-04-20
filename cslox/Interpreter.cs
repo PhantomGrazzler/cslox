@@ -266,6 +266,13 @@ public class Interpreter : Expr.IVisitor<object?>
     /// <summary>
     /// 
     /// </summary>
+    /// <param name="expr"></param>
+    /// <returns></returns>
+    public object? VisitThisExpr(Expr.This expr) => LookUpVariable(name: expr.Keyword, expr: expr);
+
+    /// <summary>
+    /// 
+    /// </summary>
     /// <param name="expr">Unary expression.</param>
     /// <returns></returns>
     public object? VisitUnaryExpr(Expr.Unary expr)

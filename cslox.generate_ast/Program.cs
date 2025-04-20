@@ -15,6 +15,7 @@ DefineAst(outputDirectory, "Expr",
     "Literal    : object? Value",
     "Logical    : Expr Left, Token Operator, Expr Right",
     "Set        : Expr Object, Token Name, Expr Value",
+    "This       : Token Keyword",
     "Unary      : Token Operator, Expr Right",
     "Variable   : Token Name",
 ]);

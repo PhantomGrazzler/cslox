@@ -16,12 +16,19 @@ internal class Resolver : Expr.IVisitor<object?>
         Method,
     }
 
+    private enum ClassType
+    {
+        None,
+        Class,
+    }
+
     private readonly Interpreter m_interpreter;
     /// <summary>
     /// Dictionary maps variable name (lexeme) to its initialisation status.
     /// </summary>
     private readonly Stack<Dictionary<string, Status>> m_scopes = new();
     private FunctionType m_currentFunction = FunctionType.None;
+    private ClassType m_currentClass = ClassType.None;
 
     internal Resolver(Interpreter interpreter)
     {
@@ -53,14 +60,23 @@ internal class Resolver : Expr.IVisitor<object?>
 
     public object? VisitClassStmt(Stmt.Class stmt)
     {
+        var enclosingClass = m_currentClass;
+        m_currentClass = ClassType.Class;
+
         Declare(stmt.Name);
         Define(stmt.Name);
+
+        BeginScope();
+        m_scopes.Peek()["this"] = Status.Initialised;
 
         foreach (var method in stmt.Methods)
         {
             var declaration = FunctionType.Method;
             ResolveFunction(method, declaration);
         }
+
+        EndScope();
+        m_currentClass = enclosingClass;
 
         return null;
     }
@@ -153,6 +169,18 @@ internal class Resolver : Expr.IVisitor<object?>
     {
         Resolve(expr.Value);
         Resolve(expr.Object);
+        return null;
+    }
+
+    public object? VisitThisExpr(Expr.This expr)
+    {
+        if (m_currentClass == ClassType.None)
+        {
+            Lox.Error(expr.Keyword, $"Cannot use '{expr.Keyword.Lexeme}' outside of a class.");
+            return null;
+        }
+
+        ResolveLocal(expr: expr, name: expr.Keyword);
         return null;
     }
 

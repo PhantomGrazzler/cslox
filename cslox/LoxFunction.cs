@@ -34,5 +34,12 @@ internal class LoxFunction : ILoxCallable
         return null;
     }
 
+    internal LoxFunction Bind(LoxInstance instance)
+    {
+        var environment = new LoxEnvironment(m_closure);
+        environment.Define(name: "this", value: instance);
+        return new LoxFunction(declaration: m_declaration, closure: environment);
+    }
+
     public override string ToString() => $"<fn {m_declaration.Name.Lexeme}>";
 }
