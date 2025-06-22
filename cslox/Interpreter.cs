@@ -307,7 +307,7 @@ public class Interpreter : Expr.IVisitor<object?>
     {
         if (m_locals.TryGetValue(expr, out var distance))
         {
-            return m_environment.GetAt(distance, name);
+            return m_environment.GetAt(distance, name.Lexeme);
         }
         else
         {
@@ -387,7 +387,7 @@ public class Interpreter : Expr.IVisitor<object?>
     /// <returns><c>null</c></returns>
     public object? VisitFunctionStmt(Stmt.Function stmt)
     {
-        var function = new LoxFunction(stmt, m_environment);
+        var function = new LoxFunction(stmt, m_environment, isInitialiser: false);
         m_environment.Define(stmt.Name.Lexeme, function);
         return null;
     }
@@ -505,7 +505,8 @@ public class Interpreter : Expr.IVisitor<object?>
         var methods = new Dictionary<string, LoxFunction>();
         foreach (var method in stmt.Methods)
         {
-            methods[method.Name.Lexeme] = new LoxFunction(declaration: method, closure: m_environment);
+            methods[method.Name.Lexeme] = new LoxFunction(
+                declaration: method, closure: m_environment, isInitialiser: method.Name.Lexeme == "init");
         }
 
         var loxClass = new LoxClass(name: stmt.Name.Lexeme, methods: methods);

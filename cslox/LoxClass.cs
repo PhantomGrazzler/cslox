@@ -3,6 +3,7 @@ namespace cslox;
 
 internal class LoxClass : ILoxCallable
 {
+    internal readonly string InitMethodName = "init";
     internal readonly string Name;
     private readonly Dictionary<string, LoxFunction> m_methods;
 
@@ -12,11 +13,18 @@ internal class LoxClass : ILoxCallable
         m_methods = methods;
     }
 
-    public int Arity() => 0;
+    public int Arity()
+    {
+        var initialiser = FindMethod(InitMethodName);
+        return initialiser == null ? 0 : initialiser.Arity();
+    }
 
     public object? Call(Interpreter interpreter, IEnumerable<object?> arguments)
     {
-        return new LoxInstance(this);
+        var instance = new LoxInstance(this);
+        var initialiser = FindMethod(InitMethodName);
+        _ = initialiser?.Bind(instance).Call(interpreter, arguments);
+        return instance;
     }
 
     internal LoxFunction? FindMethod(string name)

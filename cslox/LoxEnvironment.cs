@@ -6,7 +6,7 @@
 public class LoxEnvironment
 {
     private readonly LoxEnvironment? m_enclosing;
-    private readonly Dictionary<string, object?> m_environment = new();
+    private readonly Dictionary<string, object?> m_environment = [];
 
     internal LoxEnvironment(LoxEnvironment? enclosing = null)
     {
@@ -20,9 +20,9 @@ public class LoxEnvironment
 
     internal object? Get(Token name)
     {
-        if (m_environment.ContainsKey(name.Lexeme))
+        if (m_environment.TryGetValue(name.Lexeme, out object? value))
         {
-            return m_environment[name.Lexeme];
+            return value;
         }
         else if (m_enclosing != null)
         {
@@ -34,9 +34,9 @@ public class LoxEnvironment
         }
     }
 
-    internal object? GetAt(int distance, Token name)
+    internal object? GetAt(int distance, string name)
     {
-        return Ancestor(distance).Get(name);
+        return Ancestor(distance).m_environment.TryGetValue(name, out object? value) ? value : null;
     }
 
     private LoxEnvironment Ancestor(int distance)

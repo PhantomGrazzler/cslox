@@ -13,6 +13,7 @@ internal class Resolver : Expr.IVisitor<object?>
     {
         None,
         Function,
+        Initialiser,
         Method,
     }
 
@@ -71,7 +72,7 @@ internal class Resolver : Expr.IVisitor<object?>
 
         foreach (var method in stmt.Methods)
         {
-            var declaration = FunctionType.Method;
+            var declaration = method.Name.Lexeme == "init" ? FunctionType.Initialiser : FunctionType.Method;
             ResolveFunction(method, declaration);
         }
 
@@ -199,8 +200,14 @@ internal class Resolver : Expr.IVisitor<object?>
 
         if (stmt.Value != null)
         {
+            if (m_currentFunction == FunctionType.Initialiser)
+            {
+                Lox.Error(stmt.Keyword, "Cannot return a value from an initialiser.");
+            }
+
             Resolve(stmt.Value);
         }
+
         return null;
     }
 
