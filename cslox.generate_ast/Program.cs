@@ -23,7 +23,7 @@ DefineAst(outputDirectory, "Expr",
 DefineAst(outputDirectory, "Stmt",
 [
     "Block                  : List<Stmt?> Statements",
-    "Class                  : Token Name, List<Stmt.Function> Methods",
+    "Class                  : Token Name, Expr.Variable? Superclass, List<Stmt.Function> Methods",
     "ExpressionStatement    : Expr Expression",
     "Function               : Token Name, List<Token> Params, List<Stmt?> Body",
     "If                     : Expr Condition, Stmt ThenBranch, Stmt? ElseBranch",

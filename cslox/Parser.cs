@@ -15,7 +15,8 @@ public class ParseError : Exception
 /// <summary>
 /// 
 /// </summary>
-public class Parser
+/// <param name="tokens">Tokens to be parsed when calling <see cref="Parse"/>.</param>
+public class Parser(List<Token> tokens)
 {
     private enum Kind
     {
@@ -24,17 +25,8 @@ public class Parser
     }
 
     private const int MaxArguments = 255;
-    private readonly List<Token> m_tokens = new();
+    private readonly List<Token> m_tokens = tokens;
     private int m_currentIndex = 0;
-
-    /// <summary>
-    /// Construct a <see cref="Parser"/> with the provided tokens.
-    /// </summary>
-    /// <param name="tokens">Tokens to be parsed when calling <see cref="Parse"/>.</param>
-    public Parser(List<Token> tokens)
-    {
-        m_tokens = tokens;
-    }
 
     /// <summary>
     /// Parse the tokens provided when the parser was constructed.
@@ -68,9 +60,17 @@ public class Parser
         }
     }
 
-    private Stmt ClassDeclaration()
+    private Stmt.Class ClassDeclaration()
     {
         var name = Consume(TokenType.Identifier, "Expected class name.");
+
+        Expr.Variable? superclass = null;
+        if (Match(TokenType.Less))
+        {
+            _ = Consume(TokenType.Identifier, "Expected a superclass name.");
+            superclass = new Expr.Variable(Previous());
+        }
+
         _ = Consume(TokenType.LeftBrace, "Expected '{' before class body.");
 
         List<Stmt.Function> methods = [];
@@ -81,7 +81,7 @@ public class Parser
 
         _ = Consume(TokenType.RightBrace, "Expected '}' after class body.");
 
-        return new Stmt.Class(name, methods);
+        return new Stmt.Class(name, superclass, methods);
     }
 
     private Stmt Statement()
@@ -118,22 +118,20 @@ public class Parser
 
         if (increment != null)
         {
-            // TODO: Use collection initializer after upgrading to C#12.
-            body = new Stmt.Block(new() { body, new Stmt.ExpressionStatement(increment) });
+            body = new Stmt.Block([body, new Stmt.ExpressionStatement(increment)]);
         }
 
         body = new Stmt.While(condition, body);
 
         if (initializer != null)
         {
-            // TODO: Use collection initializer after upgrading to C#12.
-            body = new Stmt.Block(new() { initializer, body });
+            body = new Stmt.Block([initializer, body]);
         }
 
         return body;
     }
 
-    private Stmt IfStatement()
+    private Stmt.If IfStatement()
     {
         _ = Consume(TokenType.LeftParen, "Expected '(' after 'if'.");
         var condition = Expression();
@@ -145,7 +143,7 @@ public class Parser
         return new Stmt.If(condition, thenBranch, elseBranch);
     }
 
-    private Stmt PrintStatement()
+    private Stmt.Print PrintStatement()
     {
         var value = Expression();
         _ = Consume(TokenType.Semicolon, "Expected ';' after value.");
@@ -153,7 +151,7 @@ public class Parser
         return new Stmt.Print(value);
     }
 
-    private Stmt ReturnStatement()
+    private Stmt.Return ReturnStatement()
     {
         var keyword = Previous();
         Expr? value = null;
@@ -166,7 +164,7 @@ public class Parser
         return new Stmt.Return(keyword, value);
     }
 
-    private Stmt WhileStatement()
+    private Stmt.While WhileStatement()
     {
         _ = Consume(TokenType.LeftParen, "Expected '(' after 'while'.");
         var condition = Expression();
@@ -176,7 +174,7 @@ public class Parser
         return new Stmt.While(condition, body);
     }
 
-    private Stmt VarDeclaration()
+    private Stmt.Var VarDeclaration()
     {
         var name = Consume(TokenType.Identifier, "Expected a variable name.");
         var initializer = Match(TokenType.Equal) ? Expression() : null;
@@ -185,7 +183,7 @@ public class Parser
         return new Stmt.Var(name, initializer);
     }
 
-    private Stmt ExpressionStatement()
+    private Stmt.ExpressionStatement ExpressionStatement()
     {
         var expr = Expression();
         _ = Consume(TokenType.Semicolon, "Expected ';' after expression.");
@@ -372,7 +370,7 @@ public class Parser
         return expr;
     }
 
-    private Expr FinishCall(Expr callee)
+    private Expr.Call FinishCall(Expr callee)
     {
         var arguments = new List<Expr>();
 

@@ -5,22 +5,14 @@ namespace cslox;
 /// <summary>
 /// 
 /// </summary>
-public sealed class RuntimeError : Exception
+/// <param name="token"></param>
+/// <param name="message"></param>
+public sealed class RuntimeError(Token token, string message) : Exception(message)
 {
     /// <summary>
     /// 
     /// </summary>
-    public Token Token { get; }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="token"></param>
-    /// <param name="message"></param>
-    public RuntimeError(Token token, string message) : base(message)
-    {
-        Token = token;
-    }
+    public Token Token { get; } = token;
 }
 
 internal class ClockCallable : ILoxCallable
@@ -48,7 +40,7 @@ public class Interpreter : Expr.IVisitor<object?>
                          , Stmt.IVisitor<object?>
 {
     private LoxEnvironment m_environment;
-    private readonly Dictionary<Expr, int> m_locals = new();
+    private readonly Dictionary<Expr, int> m_locals = [];
 
     /// <summary>
     /// Global environment.
@@ -500,16 +492,29 @@ public class Interpreter : Expr.IVisitor<object?>
     /// <returns><c>null</c></returns>
     public object? VisitClassStmt(Stmt.Class stmt)
     {
+        object? superclass = null;
+        if (stmt.Superclass != null)
+        {
+            superclass = Evaluate(stmt.Superclass);
+
+            if (superclass is not LoxClass)
+            {
+                throw new RuntimeError(stmt.Superclass.Name, "Superclass must be a class.");
+            }
+        }
+
         m_environment.Define(stmt.Name.Lexeme, value: null);
 
         var methods = new Dictionary<string, LoxFunction>();
         foreach (var method in stmt.Methods)
         {
             methods[method.Name.Lexeme] = new LoxFunction(
-                declaration: method, closure: m_environment, isInitialiser: method.Name.Lexeme == "init");
+                declaration: method,
+                closure: m_environment,
+                isInitialiser: method.Name.Lexeme == LoxClass.InitMethodName);
         }
 
-        var loxClass = new LoxClass(name: stmt.Name.Lexeme, methods: methods);
+        var loxClass = new LoxClass(name: stmt.Name.Lexeme, (LoxClass?)superclass, methods: methods);
         m_environment.Assign(stmt.Name, loxClass);
 
         return null;

@@ -67,12 +67,24 @@ internal class Resolver : Expr.IVisitor<object?>
         Declare(stmt.Name);
         Define(stmt.Name);
 
+        if (stmt.Superclass != null)
+        {
+            if (stmt.Name.Lexeme == stmt.Superclass.Name.Lexeme)
+            {
+                Lox.Error(stmt.Superclass.Name, "A class cannot inherit from itself.");
+            }
+
+            Resolve(stmt.Superclass);
+        }
+
         BeginScope();
         m_scopes.Peek()["this"] = Status.Initialised;
 
         foreach (var method in stmt.Methods)
         {
-            var declaration = method.Name.Lexeme == "init" ? FunctionType.Initialiser : FunctionType.Method;
+            var declaration = method.Name.Lexeme == LoxClass.InitMethodName
+                ? FunctionType.Initialiser
+                : FunctionType.Method;
             ResolveFunction(method, declaration);
         }
 

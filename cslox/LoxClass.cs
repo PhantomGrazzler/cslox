@@ -3,13 +3,15 @@ namespace cslox;
 
 internal class LoxClass : ILoxCallable
 {
-    internal readonly string InitMethodName = "init";
+    internal static readonly string InitMethodName = "init";
     internal readonly string Name;
+    internal readonly LoxClass? Superclass;
     private readonly Dictionary<string, LoxFunction> m_methods;
 
-    internal LoxClass(string name, Dictionary<string, LoxFunction> methods)
+    internal LoxClass(string name, LoxClass? superclass, Dictionary<string, LoxFunction> methods)
     {
         Name = name;
+        Superclass = superclass;
         m_methods = methods;
     }
 
@@ -32,6 +34,11 @@ internal class LoxClass : ILoxCallable
         if (m_methods.TryGetValue(name, out var method))
         {
             return method;
+        }
+
+        if (Superclass != null)
+        {
+            return Superclass.FindMethod(name);
         }
 
         return null;
