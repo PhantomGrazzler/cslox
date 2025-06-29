@@ -21,6 +21,7 @@ internal class Resolver : Expr.IVisitor<object?>
     {
         None,
         Class,
+        Subclass,
     }
 
     private readonly Interpreter m_interpreter;
@@ -74,11 +75,14 @@ internal class Resolver : Expr.IVisitor<object?>
                 Lox.Error(stmt.Superclass.Name, "A class cannot inherit from itself.");
             }
 
+            m_currentClass = ClassType.Subclass;
             Resolve(stmt.Superclass);
+            BeginScope();
+            m_scopes.Peek().Add("super", Status.Initialised);
         }
 
         BeginScope();
-        m_scopes.Peek()["this"] = Status.Initialised;
+        m_scopes.Peek().Add("this", Status.Initialised);
 
         foreach (var method in stmt.Methods)
         {
@@ -89,12 +93,16 @@ internal class Resolver : Expr.IVisitor<object?>
         }
 
         EndScope();
+        if (stmt.Superclass != null)
+        {
+            EndScope();
+        }
         m_currentClass = enclosingClass;
 
         return null;
     }
 
-    private void BeginScope() => m_scopes.Push(new());
+    private void BeginScope() => m_scopes.Push([]);
     private void EndScope() => m_scopes.Pop();
 
     internal void Resolve(List<Stmt?> statements)
@@ -111,7 +119,7 @@ internal class Resolver : Expr.IVisitor<object?>
     public object? VisitCallExpr(Expr.Call expr)
     {
         Resolve(expr.Callee);
-        expr.Arguments.ForEach(arg => Resolve(arg));
+        expr.Arguments.ForEach(Resolve);
         return null;
     }
 
@@ -185,6 +193,26 @@ internal class Resolver : Expr.IVisitor<object?>
         return null;
     }
 
+    public object? VisitSuperExpr(Expr.Super expr)
+    {
+        switch (m_currentClass)
+        {
+            case ClassType.None:
+                Lox.Error(token: expr.Keyword, "Cannot use 'super' outside of a class.");
+                break;
+
+            case ClassType.Class:
+                Lox.Error(token: expr.Keyword, "Cannot use 'super' in a class with no superclass.");
+                break;
+
+            case ClassType.Subclass:
+                ResolveLocal(expr: expr, name: expr.Keyword);
+                break;
+        }
+
+        return null;
+    }
+
     public object? VisitThisExpr(Expr.This expr)
     {
         if (m_currentClass == ClassType.None)
@@ -232,8 +260,8 @@ internal class Resolver : Expr.IVisitor<object?>
     public object? VisitVariableExpr(Expr.Variable expr)
     {
         if (m_scopes.TryPeek(out var scope) &&
-            scope.ContainsKey(expr.Name.Lexeme) &&
-            scope[expr.Name.Lexeme] == Status.Uninitialised)
+            scope.TryGetValue(expr.Name.Lexeme, out Status value) &&
+            value == Status.Uninitialised)
         {
             Lox.Error(token: expr.Name, message: "Cannot read local variable in its own initialiser.");
         }

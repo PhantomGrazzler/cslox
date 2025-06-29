@@ -260,6 +260,26 @@ public class Interpreter : Expr.IVisitor<object?>
     /// </summary>
     /// <param name="expr"></param>
     /// <returns></returns>
+    public object? VisitSuperExpr(Expr.Super expr)
+    {
+        if (m_locals.TryGetValue(expr, out var distance))
+        {
+            var superclass = (LoxClass?)m_environment.GetAt(distance: distance, name: expr.Keyword.Lexeme);
+            var loxObject = (LoxInstance?)m_environment.GetAt(distance: distance - 1, "this")
+                ?? throw new RuntimeError(token: expr.Method, "Could not find 'this' of corresponding superclass.");
+            var method = superclass?.FindMethod(name: expr.Method.Lexeme)
+                ?? throw new RuntimeError(token: expr.Method, message: $"Undefined property '{expr.Method.Lexeme}'.");
+            return method.Bind(loxObject);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="expr"></param>
+    /// <returns></returns>
     public object? VisitThisExpr(Expr.This expr) => LookUpVariable(name: expr.Keyword, expr: expr);
 
     /// <summary>
@@ -505,6 +525,12 @@ public class Interpreter : Expr.IVisitor<object?>
 
         m_environment.Define(stmt.Name.Lexeme, value: null);
 
+        if (stmt.Superclass != null)
+        {
+            m_environment = new LoxEnvironment(enclosing: m_environment);
+            m_environment.Define(name: "super", superclass);
+        }
+
         var methods = new Dictionary<string, LoxFunction>();
         foreach (var method in stmt.Methods)
         {
@@ -515,6 +541,12 @@ public class Interpreter : Expr.IVisitor<object?>
         }
 
         var loxClass = new LoxClass(name: stmt.Name.Lexeme, (LoxClass?)superclass, methods: methods);
+
+        if (superclass != null && m_environment.Enclosing != null)
+        {
+            m_environment = m_environment.Enclosing;
+        }
+
         m_environment.Assign(stmt.Name, loxClass);
 
         return null;

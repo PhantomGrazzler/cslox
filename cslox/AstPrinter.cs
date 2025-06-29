@@ -77,6 +77,13 @@ public sealed class AstPrinter : Expr.IVisitor<string>
     /// </summary>
     /// <param name="expr"></param>
     /// <returns></returns>
+    public string VisitSuperExpr(Expr.Super expr) => $"{expr.Keyword.Lexeme}.{expr.Method.Lexeme}";
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="expr"></param>
+    /// <returns></returns>
     public string VisitThisExpr(Expr.This expr) => $"{expr.Keyword.Lexeme}";
 
     /// <summary>

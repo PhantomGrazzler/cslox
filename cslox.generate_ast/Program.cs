@@ -5,6 +5,8 @@
 }
 
 var outputDirectory = args[0];
+const string Indent = "    ";
+
 DefineAst(outputDirectory, "Expr",
 [
     "Assign     : Token Name, Expr Value",
@@ -15,6 +17,7 @@ DefineAst(outputDirectory, "Expr",
     "Literal    : object? Value",
     "Logical    : Expr Left, Token Operator, Expr Right",
     "Set        : Expr Object, Token Name, Expr Value",
+    "Super      : Token Keyword, Token Method",
     "This       : Token Keyword",
     "Unary      : Token Operator, Expr Right",
     "Variable   : Token Name",
@@ -32,8 +35,6 @@ DefineAst(outputDirectory, "Stmt",
     "While                  : Expr Condition, Stmt Body",
     "Var                    : Token Name, Expr? Initializer",
 ]);
-
-const string Indent = "    ";
 
 static void DefineAst(string outputDirectory, string baseName, List<string> types)
 {

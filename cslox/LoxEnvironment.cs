@@ -5,12 +5,12 @@
 /// </summary>
 public class LoxEnvironment
 {
-    private readonly LoxEnvironment? m_enclosing;
+    internal readonly LoxEnvironment? Enclosing;
     private readonly Dictionary<string, object?> m_environment = [];
 
     internal LoxEnvironment(LoxEnvironment? enclosing = null)
     {
-        m_enclosing = enclosing;
+        Enclosing = enclosing;
     }
 
     internal void Define(string name, object? value)
@@ -24,9 +24,9 @@ public class LoxEnvironment
         {
             return value;
         }
-        else if (m_enclosing != null)
+        else if (Enclosing != null)
         {
-            return m_enclosing.Get(name);
+            return Enclosing.Get(name);
         }
         else
         {
@@ -44,7 +44,7 @@ public class LoxEnvironment
         var environment = this;
         for (var i = 0; i < distance; i++)
         {
-            environment = environment?.m_enclosing;
+            environment = environment?.Enclosing;
         }
 
         if (environment == null)
@@ -62,9 +62,9 @@ public class LoxEnvironment
         {
             m_environment[name.Lexeme] = value;
         }
-        else if (m_enclosing != null)
+        else if (Enclosing != null)
         {
-            m_enclosing.Assign(name, value);
+            Enclosing.Assign(name, value);
         }
         else
         {

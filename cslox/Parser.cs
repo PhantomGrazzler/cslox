@@ -3,13 +3,9 @@
 /// <summary>
 /// Exception thrown by the parser if it fails to parse the provided input.
 /// </summary>
-public class ParseError : Exception
+/// <param name="message"></param>
+public class ParseError(string message) : Exception(message)
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="message"></param>
-    public ParseError(string message) : base(message) { }
 }
 
 /// <summary>
@@ -399,6 +395,15 @@ public class Parser(List<Token> tokens)
         if (Match(TokenType.Nil)) return new Expr.Literal(null);
         if (Match(TokenType.Number, TokenType.String)) return new Expr.Literal(Previous().Literal);
         if (Match(TokenType.Identifier)) return new Expr.Variable(Previous());
+
+        if (Match(TokenType.Super))
+        {
+            var keyword = Previous();
+            _ = Consume(TokenType.Dot, "Expected '.' after 'super'.");
+            var method = Consume(TokenType.Identifier, "Expected superclass method name after '.'.");
+            return new Expr.Super(keyword, method);
+        }
+
         if (Match(TokenType.This)) return new Expr.This(Previous());
 
         if (Match(TokenType.LeftParen))
