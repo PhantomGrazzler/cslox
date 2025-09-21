@@ -18,7 +18,7 @@ A Lox interpreter written in C# 12 (.NET 8), based on Bob Nystrom's excellent bo
 - [x] Chapter 10. [Functions](http://craftinginterpreters.com/functions.html) (Tag [Chapter10_Functions](https://github.com/PhantomGrazzler/cslox/releases/tag/Chapter10_Functions))
 - [x] Chapter 11. [Resolving and Binding](http://craftinginterpreters.com/resolving-and-binding.html) (Tag [Chapter11_ResolvingAndBinding](https://github.com/PhantomGrazzler/cslox/releases/tag/Chapter11_ResolvingAndBinding))
 - [x] Chapter 12. [Classes](http://craftinginterpreters.com/classes.html) (Tag [Chapter12_Classes](https://github.com/PhantomGrazzler/cslox/releases/tag/Chapter12_Classes))
-- [ ] Chapter 13. [Inheritance](http://craftinginterpreters.com/inheritance.html)
+- [x] Chapter 13. [Inheritance](http://craftinginterpreters.com/inheritance.html)  (Tag [Chapter13_Inheritance](https://github.com/PhantomGrazzler/cslox/releases/tag/Chapter13_Inheritance))
 
 ### Bytecode virtual machine
 
